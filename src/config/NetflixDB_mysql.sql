@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Дек 16 2023 г., 13:49
+-- Время создания: Янв 10 2024 г., 17:00
 -- Версия сервера: 11.2.2-MariaDB-1:11.2.2+maria~ubu2204
--- Версия PHP: 8.2.13
+-- Версия PHP: 8.2.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -45,9 +45,9 @@ CREATE TABLE `Classification` (
 
 CREATE TABLE `Content` (
   `ContentID` int(11) NOT NULL,
-  `SeriesID_` int(11) DEFAULT NULL,
-  `MovieID_` int(11) DEFAULT NULL,
-  `ProfileID_` int(11) DEFAULT NULL
+  `SeriesID` int(11) DEFAULT NULL,
+  `MovieID` int(11) DEFAULT NULL,
+  `ProfileID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -69,7 +69,8 @@ CREATE TABLE `Genre` (
 
 CREATE TABLE `Movie` (
   `MovieID` int(11) NOT NULL,
-  `GenreID_` int(11) DEFAULT NULL,
+  `GenreID` int(11) DEFAULT NULL,
+  `ClassificationID` int(11) NOT NULL,
   `MovieTitle` varchar(50) DEFAULT NULL,
   `MovieDescription` varchar(50) DEFAULT NULL,
   `Quality` varchar(10) DEFAULT NULL,
@@ -87,10 +88,11 @@ CREATE TABLE `Movie` (
 --
 
 CREATE TABLE `Profile` (
-  `ProfileID` int(11) DEFAULT NULL,
-  `UserID_` int(11) DEFAULT NULL,
-  `ClassificationID_` int(11) DEFAULT NULL,
-  `ContentID_` int(11) DEFAULT NULL,
+  `ProfileID` int(11) NOT NULL,
+  `UserID` int(11) DEFAULT NULL,
+  `ClassificationID` int(11) DEFAULT NULL,
+  `ContentID` int(11) DEFAULT NULL,
+  `WatchlistID` int(11) NOT NULL,
   `ProfileName` varchar(50) DEFAULT NULL,
   `ProfilePhoto` tinyint(4) DEFAULT NULL,
   `Age` int(11) DEFAULT NULL,
@@ -105,8 +107,8 @@ CREATE TABLE `Profile` (
 
 CREATE TABLE `Series` (
   `SeriesID` int(11) NOT NULL,
-  `GenreID_` int(11) DEFAULT NULL,
-  `ClassificationID_` int(11) DEFAULT NULL,
+  `GenreID` int(11) DEFAULT NULL,
+  `ClassificationID` int(11) DEFAULT NULL,
   `SeriesTitle` varchar(50) DEFAULT NULL,
   `SeriesDescription` varchar(50) DEFAULT NULL,
   `Quality` varchar(50) DEFAULT NULL,
@@ -126,13 +128,13 @@ CREATE TABLE `Series` (
 --
 
 CREATE TABLE `Subscription` (
-  `SubscriptionID` int(11) DEFAULT NULL,
+  `SubscriptionID` int(11) NOT NULL,
   `UserID` int(11) DEFAULT NULL,
   `Description` varchar(50) DEFAULT NULL,
   `Price` double DEFAULT NULL,
   `Quality` int(11) DEFAULT NULL,
   `SubscriptionType` varchar(50) DEFAULT NULL,
-  `SignUpDate` date DEFAULT NULL,
+  `SignUpDate` date DEFAULT current_timestamp(),
   `FriendInvited` tinyint(4) DEFAULT NULL,
   `IsPaidAccount` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -145,6 +147,7 @@ CREATE TABLE `Subscription` (
 
 CREATE TABLE `User` (
   `UserID` int(11) NOT NULL,
+  `SubscriptionID` int(11) NOT NULL,
   `Username` varchar(50) DEFAULT NULL,
   `Email` varchar(50) DEFAULT NULL,
   `Password` varchar(50) DEFAULT NULL,
@@ -163,10 +166,31 @@ CREATE TABLE `User` (
 CREATE TABLE `Watchlist` (
   `WatchlistID` int(11) NOT NULL,
   `ProfileID` int(11) DEFAULT NULL,
-  `UserID` int(11) DEFAULT NULL,
-  `SeriesID` int(11) DEFAULT NULL,
-  `MovieID` int(11) DEFAULT NULL,
-  `dateAdded` date DEFAULT NULL
+  `dateAdded` date DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `WatchlistMovie`
+--
+
+CREATE TABLE `WatchlistMovie` (
+  `WatchlistMovieID` int(11) NOT NULL,
+  `WatchlistID` int(11) NOT NULL,
+  `MovieID` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `WatchlistSeries`
+--
+
+CREATE TABLE `WatchlistSeries` (
+  `WatchlistSeriesID` int(11) NOT NULL,
+  `WatchlistID` int(11) NOT NULL,
+  `SeriesID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -183,7 +207,10 @@ ALTER TABLE `Classification`
 -- Индексы таблицы `Content`
 --
 ALTER TABLE `Content`
-  ADD PRIMARY KEY (`ContentID`);
+  ADD PRIMARY KEY (`ContentID`),
+  ADD KEY `MovieID` (`MovieID`) USING BTREE,
+  ADD KEY `SeriesID` (`SeriesID`) USING BTREE,
+  ADD KEY `ProfileID` (`ProfileID`) USING BTREE;
 
 --
 -- Индексы таблицы `Genre`
@@ -195,41 +222,195 @@ ALTER TABLE `Genre`
 -- Индексы таблицы `Movie`
 --
 ALTER TABLE `Movie`
-  ADD PRIMARY KEY (`MovieID`);
+  ADD PRIMARY KEY (`MovieID`),
+  ADD KEY `ClassificationID` (`ClassificationID`),
+  ADD KEY `GenreID` (`GenreID`) USING BTREE;
+
+--
+-- Индексы таблицы `Profile`
+--
+ALTER TABLE `Profile`
+  ADD PRIMARY KEY (`ProfileID`),
+  ADD KEY `WatchlistID` (`WatchlistID`),
+  ADD KEY `UserID` (`UserID`) USING BTREE,
+  ADD KEY `ClassificationID` (`ClassificationID`) USING BTREE,
+  ADD KEY `ContentID` (`ContentID`) USING BTREE;
 
 --
 -- Индексы таблицы `Series`
 --
 ALTER TABLE `Series`
-  ADD PRIMARY KEY (`SeriesID`);
+  ADD PRIMARY KEY (`SeriesID`),
+  ADD KEY `GenreID` (`GenreID`) USING BTREE,
+  ADD KEY `ClassificationID` (`ClassificationID`) USING BTREE;
 
 --
 -- Индексы таблицы `Subscription`
 --
 ALTER TABLE `Subscription`
-  ADD KEY `FK_Subscription_User` (`UserID`);
+  ADD PRIMARY KEY (`SubscriptionID`),
+  ADD KEY `UserID` (`UserID`);
 
 --
 -- Индексы таблицы `User`
 --
 ALTER TABLE `User`
-  ADD PRIMARY KEY (`UserID`);
+  ADD PRIMARY KEY (`UserID`),
+  ADD KEY `SubscriptionID` (`SubscriptionID`);
 
 --
 -- Индексы таблицы `Watchlist`
 --
 ALTER TABLE `Watchlist`
-  ADD PRIMARY KEY (`WatchlistID`);
+  ADD PRIMARY KEY (`WatchlistID`),
+  ADD KEY `ProfileID` (`ProfileID`);
+
+--
+-- Индексы таблицы `WatchlistMovie`
+--
+ALTER TABLE `WatchlistMovie`
+  ADD PRIMARY KEY (`WatchlistMovieID`),
+  ADD KEY `WatchlistID` (`WatchlistID`),
+  ADD KEY `MovieID` (`MovieID`);
+
+--
+-- Индексы таблицы `WatchlistSeries`
+--
+ALTER TABLE `WatchlistSeries`
+  ADD PRIMARY KEY (`WatchlistSeriesID`),
+  ADD KEY `SeriesID` (`SeriesID`),
+  ADD KEY `WatchlistID` (`WatchlistID`);
+
+--
+-- AUTO_INCREMENT для сохранённых таблиц
+--
+
+--
+-- AUTO_INCREMENT для таблицы `Classification`
+--
+ALTER TABLE `Classification`
+  MODIFY `ClassificationID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Content`
+--
+ALTER TABLE `Content`
+  MODIFY `ContentID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Genre`
+--
+ALTER TABLE `Genre`
+  MODIFY `GenreID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Movie`
+--
+ALTER TABLE `Movie`
+  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Profile`
+--
+ALTER TABLE `Profile`
+  MODIFY `ProfileID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Series`
+--
+ALTER TABLE `Series`
+  MODIFY `SeriesID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `Subscription`
+--
+ALTER TABLE `Subscription`
+  MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `User`
+--
+ALTER TABLE `User`
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT для таблицы `WatchlistMovie`
+--
+ALTER TABLE `WatchlistMovie`
+  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT для таблицы `WatchlistSeries`
+--
+ALTER TABLE `WatchlistSeries`
+  MODIFY `WatchlistSeriesID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
+-- Ограничения внешнего ключа таблицы `Content`
+--
+ALTER TABLE `Content`
+  ADD CONSTRAINT `Content_ibfk_1` FOREIGN KEY (`MovieID`) REFERENCES `Movie` (`MovieID`),
+  ADD CONSTRAINT `Content_ibfk_2` FOREIGN KEY (`ProfileID`) REFERENCES `Profile` (`ProfileID`),
+  ADD CONSTRAINT `Content_ibfk_3` FOREIGN KEY (`SeriesID`) REFERENCES `Series` (`SeriesID`);
+
+--
+-- Ограничения внешнего ключа таблицы `Movie`
+--
+ALTER TABLE `Movie`
+  ADD CONSTRAINT `Movie_ibfk_1` FOREIGN KEY (`GenreID`) REFERENCES `Genre` (`GenreID`),
+  ADD CONSTRAINT `Movie_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`);
+
+--
+-- Ограничения внешнего ключа таблицы `Profile`
+--
+ALTER TABLE `Profile`
+  ADD CONSTRAINT `Profile_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
+  ADD CONSTRAINT `Profile_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`),
+  ADD CONSTRAINT `Profile_ibfk_3` FOREIGN KEY (`ContentID`) REFERENCES `Content` (`ContentID`),
+  ADD CONSTRAINT `Profile_ibfk_4` FOREIGN KEY (`WatchlistID`) REFERENCES `Watchlist` (`WatchlistID`);
+
+--
+-- Ограничения внешнего ключа таблицы `Series`
+--
+ALTER TABLE `Series`
+  ADD CONSTRAINT `Series_ibfk_1` FOREIGN KEY (`GenreID`) REFERENCES `Genre` (`GenreID`),
+  ADD CONSTRAINT `Series_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`);
+
+--
 -- Ограничения внешнего ключа таблицы `Subscription`
 --
 ALTER TABLE `Subscription`
-  ADD CONSTRAINT `FK_Subscription_User` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`);
+  ADD CONSTRAINT `Subscription_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`);
+
+--
+-- Ограничения внешнего ключа таблицы `User`
+--
+ALTER TABLE `User`
+  ADD CONSTRAINT `User_ibfk_1` FOREIGN KEY (`SubscriptionID`) REFERENCES `Subscription` (`SubscriptionID`);
+
+--
+-- Ограничения внешнего ключа таблицы `Watchlist`
+--
+ALTER TABLE `Watchlist`
+  ADD CONSTRAINT `Watchlist_ibfk_1` FOREIGN KEY (`ProfileID`) REFERENCES `Profile` (`ProfileID`);
+
+--
+-- Ограничения внешнего ключа таблицы `WatchlistMovie`
+--
+ALTER TABLE `WatchlistMovie`
+  ADD CONSTRAINT `WatchlistMovie_ibfk_1` FOREIGN KEY (`WatchlistID`) REFERENCES `Watchlist` (`WatchlistID`),
+  ADD CONSTRAINT `WatchlistMovie_ibfk_2` FOREIGN KEY (`MovieID`) REFERENCES `Movie` (`MovieID`);
+
+--
+-- Ограничения внешнего ключа таблицы `WatchlistSeries`
+--
+ALTER TABLE `WatchlistSeries`
+  ADD CONSTRAINT `WatchlistSeries_ibfk_1` FOREIGN KEY (`SeriesID`) REFERENCES `Series` (`SeriesID`),
+  ADD CONSTRAINT `WatchlistSeries_ibfk_2` FOREIGN KEY (`WatchlistID`) REFERENCES `Watchlist` (`WatchlistID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
