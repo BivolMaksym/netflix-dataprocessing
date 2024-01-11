@@ -1,16 +1,29 @@
 const express = require('express');
-const {response} = require("express");
+const bodyParser = require('body-parser');
+const AuthRoutes = require('./routes/auth.routes');
 
-const app = express ();
-app.use(express.json());
+class Server {
+    constructor() {
+        this.server = express();
+        this.port = 3000;
+        this.setupMiddleWare();
+        this.setupRoutes();
+    }
 
-app.listen(3000, () => {
-    console.log("Server listening on PORT:3000");
-});
+    setupMiddleWare() {
+        this.server.use(bodyParser.json());
+    }
 
-app.get("/status", (request, response) => {
-    const status = {
-        "Status": "Running"
-    };
-    response.send(status);
-});
+    setupRoutes() {
+        this.server.use('/auth', AuthRoutes);
+    }
+
+    start() {
+        this.server.listen(this.port, () => {
+            console.log(`Server is running on ${this.port}`);
+        });
+    }
+}
+
+const server = new Server();
+server.start();
