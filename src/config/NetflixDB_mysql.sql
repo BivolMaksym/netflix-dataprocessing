@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Янв 10 2024 г., 17:00
+-- Время создания: Янв 18 2024 г., 12:49
 -- Версия сервера: 11.2.2-MariaDB-1:11.2.2+maria~ubu2204
 -- Версия PHP: 8.2.14
 
@@ -24,30 +24,40 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Структура таблицы `Category_enums`
+--
+
+CREATE TABLE `Category_enums` (
+  `CategoryID` int(11) NOT NULL,
+  `age` int(3) DEFAULT NULL,
+  `violence` int(1) DEFAULT NULL,
+  `sex` int(1) DEFAULT NULL,
+  `terror` int(1) DEFAULT NULL,
+  `discrimination` int(1) DEFAULT NULL,
+  `drugabuse` int(1) DEFAULT NULL,
+  `courselang` int(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Category_enums`
+--
+
+INSERT INTO `Category_enums` (`CategoryID`, `age`, `violence`, `sex`, `terror`, `discrimination`, `drugabuse`, `courselang`) VALUES
+(1, 12, 0, 0, 0, 0, 0, 0);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Classification`
 --
 
 CREATE TABLE `Classification` (
   `ClassificationID` int(11) NOT NULL,
-  `PreferenceID` int(11) DEFAULT NULL,
   `InterestedInFilms` tinyint(4) DEFAULT NULL,
   `InterestedInSeries` tinyint(4) DEFAULT NULL,
   `PreferedGenres` varchar(10) DEFAULT NULL,
   `MinimumAge` varchar(10) DEFAULT NULL,
-  `ViewingClassification` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `Content`
---
-
-CREATE TABLE `Content` (
-  `ContentID` int(11) NOT NULL,
-  `SeriesID` int(11) DEFAULT NULL,
-  `MovieID` int(11) DEFAULT NULL,
-  `ProfileID` int(11) DEFAULT NULL
+  `ViewingClassification` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -69,17 +79,21 @@ CREATE TABLE `Genre` (
 
 CREATE TABLE `Movie` (
   `MovieID` int(11) NOT NULL,
-  `GenreID` int(11) DEFAULT NULL,
-  `ClassificationID` int(11) NOT NULL,
+  `ClassificationID` int(11) DEFAULT NULL,
   `MovieTitle` varchar(50) DEFAULT NULL,
   `MovieDescription` varchar(50) DEFAULT NULL,
-  `Quality` varchar(10) DEFAULT NULL,
   `AmountOfViews` int(11) DEFAULT NULL,
   `ReleaseDate` date DEFAULT NULL,
   `Genre` varchar(50) DEFAULT NULL,
-  `Availability` tinyint(4) DEFAULT NULL,
   `AvailableQualities` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Movie`
+--
+
+INSERT INTO `Movie` (`MovieID`, `ClassificationID`, `MovieTitle`, `MovieDescription`, `AmountOfViews`, `ReleaseDate`, `Genre`, `AvailableQualities`) VALUES
+(1, NULL, '123123', '123123123', 123123321, '2024-01-02', NULL, '123');
 
 -- --------------------------------------------------------
 
@@ -91,13 +105,19 @@ CREATE TABLE `Profile` (
   `ProfileID` int(11) NOT NULL,
   `UserID` int(11) DEFAULT NULL,
   `ClassificationID` int(11) DEFAULT NULL,
-  `ContentID` int(11) DEFAULT NULL,
-  `WatchlistID` int(11) NOT NULL,
+  `WatchlistID` int(11) DEFAULT NULL,
   `ProfileName` varchar(50) DEFAULT NULL,
   `ProfilePhoto` tinyint(4) DEFAULT NULL,
   `Age` int(11) DEFAULT NULL,
   `Language` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Profile`
+--
+
+INSERT INTO `Profile` (`ProfileID`, `UserID`, `ClassificationID`, `WatchlistID`, `ProfileName`, `ProfilePhoto`, `Age`, `Language`) VALUES
+(1, NULL, NULL, 24, 'Maksym', 1, 18, 'English');
 
 -- --------------------------------------------------------
 
@@ -107,19 +127,22 @@ CREATE TABLE `Profile` (
 
 CREATE TABLE `Series` (
   `SeriesID` int(11) NOT NULL,
-  `GenreID` int(11) DEFAULT NULL,
   `ClassificationID` int(11) DEFAULT NULL,
   `SeriesTitle` varchar(50) DEFAULT NULL,
   `SeriesDescription` varchar(50) DEFAULT NULL,
-  `Quality` varchar(50) DEFAULT NULL,
   `AmountOfViews` int(11) DEFAULT NULL,
   `AmountOfEpisodes` int(11) DEFAULT NULL,
   `ReleaseDate` date DEFAULT NULL,
   `Genre` varchar(50) DEFAULT NULL,
-  `Availability` tinyint(4) DEFAULT NULL,
-  `availableQualities` varchar(10) DEFAULT NULL,
-  `Classification` varchar(50) DEFAULT NULL
+  `availableQualities` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Series`
+--
+
+INSERT INTO `Series` (`SeriesID`, `ClassificationID`, `SeriesTitle`, `SeriesDescription`, `AmountOfViews`, `AmountOfEpisodes`, `ReleaseDate`, `Genre`, `availableQualities`) VALUES
+(1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -132,12 +155,18 @@ CREATE TABLE `Subscription` (
   `UserID` int(11) DEFAULT NULL,
   `Description` varchar(50) DEFAULT NULL,
   `Price` double DEFAULT NULL,
-  `Quality` int(11) DEFAULT NULL,
-  `SubscriptionType` varchar(50) DEFAULT NULL,
+  `Quality` varchar(2) DEFAULT NULL,
   `SignUpDate` date DEFAULT current_timestamp(),
   `FriendInvited` tinyint(4) DEFAULT NULL,
   `IsPaidAccount` tinyint(4) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `Subscription`
+--
+
+INSERT INTO `Subscription` (`SubscriptionID`, `UserID`, `Description`, `Price`, `Quality`, `SignUpDate`, `FriendInvited`, `IsPaidAccount`) VALUES
+(3, 2, 'abracadabra123', 120, 'HD', '2024-01-15', 1, 2);
 
 -- --------------------------------------------------------
 
@@ -147,16 +176,23 @@ CREATE TABLE `Subscription` (
 
 CREATE TABLE `User` (
   `UserID` int(11) NOT NULL,
-  `SubscriptionID` int(11) NOT NULL,
+  `SubscriptionID` int(11) DEFAULT NULL,
   `Username` varchar(50) DEFAULT NULL,
   `Email` varchar(50) DEFAULT NULL,
-  `Password` varchar(50) DEFAULT NULL,
+  `Password` varchar(250) DEFAULT NULL,
   `ActivationStatus` tinyint(4) DEFAULT NULL,
   `LoginAttempts` int(11) DEFAULT NULL,
   `BlockStatus` tinyint(4) DEFAULT NULL,
   `FreeDaysLeft` int(11) DEFAULT NULL,
   `role` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `User`
+--
+
+INSERT INTO `User` (`UserID`, `SubscriptionID`, `Username`, `Email`, `Password`, `ActivationStatus`, `LoginAttempts`, `BlockStatus`, `FreeDaysLeft`, `role`) VALUES
+(2, NULL, 'fsdsfdg', 'sgfdsgdfsgdf', 'fgdsgfdsdgsf', 1, 0, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -170,6 +206,13 @@ CREATE TABLE `Watchlist` (
   `dateAdded` date DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Дамп данных таблицы `Watchlist`
+--
+
+INSERT INTO `Watchlist` (`WatchlistID`, `ProfileID`, `dateAdded`) VALUES
+(24, 1, '2024-01-16');
+
 -- --------------------------------------------------------
 
 --
@@ -181,6 +224,13 @@ CREATE TABLE `WatchlistMovie` (
   `WatchlistID` int(11) NOT NULL,
   `MovieID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Дамп данных таблицы `WatchlistMovie`
+--
+
+INSERT INTO `WatchlistMovie` (`WatchlistMovieID`, `WatchlistID`, `MovieID`) VALUES
+(2, 24, 1);
 
 -- --------------------------------------------------------
 
@@ -195,23 +245,28 @@ CREATE TABLE `WatchlistSeries` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Дамп данных таблицы `WatchlistSeries`
+--
+
+INSERT INTO `WatchlistSeries` (`WatchlistSeriesID`, `WatchlistID`, `SeriesID`) VALUES
+(2, 24, 1);
+
+--
 -- Индексы сохранённых таблиц
 --
+
+--
+-- Индексы таблицы `Category_enums`
+--
+ALTER TABLE `Category_enums`
+  ADD PRIMARY KEY (`CategoryID`);
 
 --
 -- Индексы таблицы `Classification`
 --
 ALTER TABLE `Classification`
-  ADD PRIMARY KEY (`ClassificationID`);
-
---
--- Индексы таблицы `Content`
---
-ALTER TABLE `Content`
-  ADD PRIMARY KEY (`ContentID`),
-  ADD KEY `MovieID` (`MovieID`) USING BTREE,
-  ADD KEY `SeriesID` (`SeriesID`) USING BTREE,
-  ADD KEY `ProfileID` (`ProfileID`) USING BTREE;
+  ADD PRIMARY KEY (`ClassificationID`),
+  ADD KEY `ViewingClassification` (`ViewingClassification`);
 
 --
 -- Индексы таблицы `Genre`
@@ -224,8 +279,7 @@ ALTER TABLE `Genre`
 --
 ALTER TABLE `Movie`
   ADD PRIMARY KEY (`MovieID`),
-  ADD KEY `ClassificationID` (`ClassificationID`),
-  ADD KEY `GenreID` (`GenreID`) USING BTREE;
+  ADD KEY `ClassificationID` (`ClassificationID`);
 
 --
 -- Индексы таблицы `Profile`
@@ -234,15 +288,13 @@ ALTER TABLE `Profile`
   ADD PRIMARY KEY (`ProfileID`),
   ADD KEY `WatchlistID` (`WatchlistID`),
   ADD KEY `UserID` (`UserID`) USING BTREE,
-  ADD KEY `ClassificationID` (`ClassificationID`) USING BTREE,
-  ADD KEY `ContentID` (`ContentID`) USING BTREE;
+  ADD KEY `ClassificationID` (`ClassificationID`) USING BTREE;
 
 --
 -- Индексы таблицы `Series`
 --
 ALTER TABLE `Series`
   ADD PRIMARY KEY (`SeriesID`),
-  ADD KEY `GenreID` (`GenreID`) USING BTREE,
   ADD KEY `ClassificationID` (`ClassificationID`) USING BTREE;
 
 --
@@ -287,16 +339,16 @@ ALTER TABLE `WatchlistSeries`
 --
 
 --
+-- AUTO_INCREMENT для таблицы `Category_enums`
+--
+ALTER TABLE `Category_enums`
+  MODIFY `CategoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT для таблицы `Classification`
 --
 ALTER TABLE `Classification`
   MODIFY `ClassificationID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT для таблицы `Content`
---
-ALTER TABLE `Content`
-  MODIFY `ContentID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `Genre`
@@ -308,61 +360,64 @@ ALTER TABLE `Genre`
 -- AUTO_INCREMENT для таблицы `Movie`
 --
 ALTER TABLE `Movie`
-  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `Profile`
 --
 ALTER TABLE `Profile`
-  MODIFY `ProfileID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ProfileID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `Series`
 --
 ALTER TABLE `Series`
-  MODIFY `SeriesID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `SeriesID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `Subscription`
 --
 ALTER TABLE `Subscription`
-  MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT для таблицы `User`
 --
 ALTER TABLE `User`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT для таблицы `Watchlist`
+--
+ALTER TABLE `Watchlist`
+  MODIFY `WatchlistID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistMovie`
 --
 ALTER TABLE `WatchlistMovie`
-  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistSeries`
 --
 ALTER TABLE `WatchlistSeries`
-  MODIFY `WatchlistSeriesID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `WatchlistSeriesID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
 
 --
--- Ограничения внешнего ключа таблицы `Content`
+-- Ограничения внешнего ключа таблицы `Classification`
 --
-ALTER TABLE `Content`
-  ADD CONSTRAINT `Content_ibfk_1` FOREIGN KEY (`MovieID`) REFERENCES `Movie` (`MovieID`),
-  ADD CONSTRAINT `Content_ibfk_2` FOREIGN KEY (`ProfileID`) REFERENCES `Profile` (`ProfileID`),
-  ADD CONSTRAINT `Content_ibfk_3` FOREIGN KEY (`SeriesID`) REFERENCES `Series` (`SeriesID`);
+ALTER TABLE `Classification`
+  ADD CONSTRAINT `Classification_ibfk_1` FOREIGN KEY (`ViewingClassification`) REFERENCES `Category_enums` (`CategoryID`);
 
 --
 -- Ограничения внешнего ключа таблицы `Movie`
 --
 ALTER TABLE `Movie`
-  ADD CONSTRAINT `Movie_ibfk_1` FOREIGN KEY (`GenreID`) REFERENCES `Genre` (`GenreID`),
   ADD CONSTRAINT `Movie_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`);
 
 --
@@ -371,14 +426,12 @@ ALTER TABLE `Movie`
 ALTER TABLE `Profile`
   ADD CONSTRAINT `Profile_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`),
   ADD CONSTRAINT `Profile_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`),
-  ADD CONSTRAINT `Profile_ibfk_3` FOREIGN KEY (`ContentID`) REFERENCES `Content` (`ContentID`),
   ADD CONSTRAINT `Profile_ibfk_4` FOREIGN KEY (`WatchlistID`) REFERENCES `Watchlist` (`WatchlistID`);
 
 --
 -- Ограничения внешнего ключа таблицы `Series`
 --
 ALTER TABLE `Series`
-  ADD CONSTRAINT `Series_ibfk_1` FOREIGN KEY (`GenreID`) REFERENCES `Genre` (`GenreID`),
   ADD CONSTRAINT `Series_ibfk_2` FOREIGN KEY (`ClassificationID`) REFERENCES `Classification` (`ClassificationID`);
 
 --
