@@ -1,15 +1,23 @@
 const express = require('express');
+const Classification = require("../controller/classification.controller.js");
 
 const router = express.Router();
+const classification = new Classification();
 
-const PrefController = require('../controller/classification.controller');
+// Add new classification 
+router.post("/:classificationID", classification.createClassification);
 
-const prefController = new PrefController();
+// Remove a classification
+router.delete("/:classificationID", classification.removeClassification);
 
-router.get('/data', prefController.getAllData);
-router.post('/data', prefController.createData);
-router.get('/data/:id', prefController.getDataById);
-router.put('/data/:id', prefController.updateData);
-router.delete('/data/:id', prefController.removeData);
+// Retrieve all classifications
+router.get("/", classification.getAllClassifications);
+
+//Retrieve a classification with certain ID 
+router.get("/:classificationID", classification.getClassificationByItsID);
+
+//Update classification using its ID
+router.put("/:classificationID", classification.updateClassification);
 
 module.exports = router;
+

@@ -1,62 +1,81 @@
-let dataStorage = [];
+const ClassificationService = require('../services/ClassificationService');
 
-// Retrieve all data
-const getAllData = (request, response) => {
-    response.json(dataStorage)
-};
-
-// Add new data
-const createData = (request, response) => {
-    const newData = request.body;
-    dataStorage.push(newData);
-    response.status(201).json(newData);
-};
-
-// Get certain data by user id
-const getDataById = (request, response) => {
-    const id = parseInt(request.params.userId);
-    const data = dataStorage.find((item) => item.classificationId === id);
-
-    if(!data) {
-        return response.status(404).json({error: 'Data not found'});
-    }
-    
-    response.json(data);
-}
-
-// Update data by user id
-const updateData = (request, response) => {
-    const id = parseInt(req.params.userId);
-    const existingData = dataStorage.find((item) => item.classificationId === id);
-  
-    if (!existingData) {
-      return res.status(404).json({ error: 'Data not found' });
+class Classification {
+    constructor() {
+        this.classification = new ClassificationService();
     }
 
-    const updatedData = {
-    ...existingData,
-    ...request.body,
+    createClassification = async (req, res) => {
+        
+        try {
+            await this.classificationService.createClassification(classificationID);
+            const {classificationId, InterestedInFilms, InterestedInSeries, PreferedGenres, MinAge, ViewingClassification} = req.body;
+            
+            if(!classificationId || !InterestedInFilms || !InterestedInSeries || !PreferedGenres || !MinAge || !ViewingClassification) {
+                return res.status(400).send("Missing information for creating new classification.")
+            } 
+            res.status(200).send("classification added successfully")
+        }  catch (err) {
+            console.err('Error creating a classification:', err);
+            res.status(500).send("Internal server error");
+        }
+        
     };
 
-    dataStorage = dataStorage.map((item) =>
-    item.classificationId === id ? updatedData : item
-    );
+    removeClassification = async (req, res) => {
+        const classification = req.body;
 
-    response.json(updatedData);
+        try {
+           
+            await this.classificationService.removeClassification(classificationID);
+            res.json({message: 'classification deleted successfully'});
+        } catch (err) {
+            console.error('Error deleting classification: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    getAllClassifications = async (req, res) => {
+        try {
+            const classifications = await this.classificationService.getAllClassifications();
+            res.json(classifications);
+        } catch (err) {
+            console.error('Error getting all classifications: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    getClassificationByItsID = async (req, res) => {
+        try {
+            const classification = await this.classificationService.getClassificationByItsID(classificationID);
+            if (classification) {
+                res.json(classification);
+            } else {
+                res.status(401).send('classification with such ID is not found.')
+            }
+        }  catch (err) {
+            console.error('Error getting classification with such id: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    updateClassification = async (req, res) => {
+        const classificationID = parseInt(req.params.classificationID);
+        const updatedClassification = req.body;
+
+        try {
+            await this.classificationService.updateClassification(classificationID, updatedClassification);
+            res.json({message: 'classification updated successfully'});
+        } catch (err) {
+            console.error('Error updating classification: ', error.message);
+            res.status(500).send('Internal server error');
+        }
+    }
+
+
 }
 
-// Remove data by user id
-const removeData = (request, response) => {
-    const id = parseInt(request.params.userId);
-    dataStorage = dataStorage.filter((item) => item.classificationId !== id);
-    response.json({message: 'Data has been deleted'})
-};
+module.exports = Movie;
 
-module.exports = {
-    getAllData,
-    getDataById,
-    createData,
-    updateData,
-    removeData,
-}
+
 
