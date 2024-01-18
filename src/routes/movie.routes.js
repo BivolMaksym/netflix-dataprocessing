@@ -1,21 +1,23 @@
-module.exports = app => {
-    const movie = require(".../controllers/movie.controller.js");
+const express = require('express');
+const Movie = require("../controller/movie.controller.js");
 
-    // Add new movie 
-    app.post("/movie", movie.create);
+const router = express.Router();
+const movie = new Movie();
 
-    // Update the list of the movies
-    app.put("/movie/:movieId", movie.update)
+// Add new movie 
+router.post("/:movieID", movie.createMovie);
 
-    // Retrieve all movies
-    app.get("/movie", movie.getAll);
+// Remove a movie
+router.delete("/:movieID", movie.removeMovie);
 
-    // Retrieve movie by its ID
-    app.get("/movie/:movieId", movie.getSpecific);
+// Retrieve all movies
+router.get("/", movie.getAllMovies);
 
-    // Remove all movies
-    app.delete("/movie", movie.deleteAll);
-    
-    // Remove a specific movie by its ID
-    app.delete("/movie/:movieId", movie.delete);
-};
+//Retrieve a movie with certain ID 
+router.get("/:movieID", movie.getMovieByItsID);
+
+//Update movie using its ID
+router.put("/:movieID", movie.updateMovie);
+
+module.exports = router;
+

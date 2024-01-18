@@ -1,123 +1,81 @@
-const movie = require("../models/movie.model");
+const MovieService = require('../services/MovieService');
 
-const Joi = require("joi");
-
-const {validateMovie} = require("../validator/validator");
-
-exports.create = (request ,response) => {
-    const {error, value} = validateMovie(request.body);
-    if (error) {
-        console.log(error);
-        return response.send("Invalid Request");
+class Movie {
+    constructor() {
+        this.movieService = new MovieService();
     }
+
+    createMovie = async (req, res) => {
+        
+        try {
+            await this.movieService.createMovie(movieID);
+            const {movieID, genreID, classificationID, movieTitle, movieDescription, amountOfViews, releaseDate, genre, availableQualities} = req.body;
+            
+            if(!movieID || !genreID || !classificationID || !movieTitle || !movieDescription || !amountOfViews || !releaseDate || !genre || !availableQualities) {
+                return res.status(400).send("Missing information for creating new movie.")
+            } 
+            res.status(200).send("Movie added successfully")
+        }  catch (err) {
+            console.err('Error creating a movie:', err);
+            res.status(500).send("Internal server error");
+        }
+        
+    };
+
+    removeMovie = async (req, res) => {
+        const movieID = req.body;
+
+        try {
+           
+            await this.movieService.removeMovie(movieID);
+            res.json({message: 'Movie deleted successfully'});
+        } catch (err) {
+            console.error('Error deleting movie: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    getAllMovies = async (req, res) => {
+        try {
+            const movies = await this.movieService.getAllMovies();
+            res.json(movies);
+        } catch (err) {
+            console.error('Error getting all movies: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    getMovieByItsID = async (req, res) => {
+        try {
+            const movie = await this.movieService.getMovieByItsID(movieID);
+            if (movie) {
+                res.json(movie);
+            } else {
+                res.status(401).send('Movie with such ID is not found.')
+            }
+        }  catch (err) {
+            console.error('Error getting movie with such id: ', err.message);
+            res.status(500).send('Internal server error');
+        }
+    };
+
+    updateMovie = async (req, res) => {
+        const movieID = parseInt(req.params.movieID);
+        const updatedMovie = req.body;
+
+        try {
+            await this.movieService.updateMovie(movieID, updatedMovie);
+            res.json({message: 'Movie updated successfully'});
+        } catch (err) {
+            console.error('Error updating movie: ', error.message);
+            res.status(500).send('Internal server error');
+        }
+    }
+
+
 }
 
-if (!request.body) {
-    response.status(200).send({
-        message: "You didn't add anything"
-    });
-}
-
-const movie = new movie({
-    movie_id: request.body.movie_id,
-    movie_title: request.body.movie_title,
-    movie_description: request.body.movie_description,
-    movie_quality: request.body.movie_quality,
-    movie_views: request.body.movie_views,
-    movie_release_date: request.body.movie_release_date,
-    movie_genre: request.body.movie_genre,
-    movie_availability: request.body.movie_availability,
-    movie_classification: request.body.movie_classification
-});
-
-movie.add(movie, (error, data) => {
-    if(error)
-    response.status(500).send({
-        message: 
-        error.message || "Error 505, please try again"
-    }); 
-    else response.send(data);
-    });
-
-exports.update = (request, response) => {
-    if(!request.body) {
-        response.status(200).send({
-            message: "You must add content, it can't be empty"
-        });
-    }
-
-    const {error, value} = validateMovie(request.body);
-    if (error) {
-        console.log(error);
-        return response.send("Invalid request");
-    }
-
-    movie.updateByID(request.params.movieID, new movie(request.body), (error, data) => {
-        if(error) {
-            if(error.type === "not_found") {
-                response.status(200).send({
-                    message: `Can't find a movie with such id ${request.params.movieID}.`
-                });
-            } else {
-                response.status(300).send({
-                    message: "Error getting a movie with such id + request.params.movieID" 
-                });
-            }
-        } else response.send(data);
-    });
-};
-
-exports.getAll = (request, response) => {
-    moviea.getAll((error, data) => {
-        if (error)
-            response.status(500).send({
-                message:
-                    error.message || "Error 302, please try again."
-            });
-        else response.send(data);
-    });
-};
+module.exports = Movie;
 
 
-exports.getByID = (request, response) => {
-    movie.getByID(request.params.movieID, (error, data) => {
-        if (error) {
-            if (error.type === "not_found") {
-                response.status(200).send({
-                    message: `Sorry can't find movie with such id ${request.params.movieID}.`
-                });
-            } else {
-                response.status(300).send({
-                    message: "Error 302, please try again " + request.params.movieID
-                });
-            }
-        } else response.send(data);
-    });
-};
 
-exports.remove = (request, response) => {
-    movie.remove(request.params.movieID, (error, data) => {
-        if (error) {
-            if (error.type === "not_found") {
-                response.status(200).send({
-                    message: `There is no film with such id ${request.params.movieID}.`
-                });
-            } else {
-                response.status(300).send({
-                    message: "Sorry some error occured while removing this movie from list" + request.params.movieID
-                });
-            }
-        } else response.send({message: `Movie has been successfully deleted from the list.`});
-    });
-};
-
-exports.removeAll = (request, response) => {
-    movie.removeAll((error, data) => {
-        if (error)
-            response.status(300).send({
-                message:
-                    error.message || "Some error occurred while removing all movies."
-            });
-        else response.send({message: `All movies have been successfully deleted from the list.`});
-    });
-};

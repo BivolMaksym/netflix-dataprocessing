@@ -1,21 +1,23 @@
-module.exports = app => {
-    const series = require(".../controllers/series.controller.js");
+const express = require('express');
+const Series = require("../controller/series.controller.js");
 
-    // Add new series 
-    app.post("/series", series.create);
+const router = express.Router();
+const series = new Series();
 
-    // Update the list of the series
-    app.put("/series/:seriesId", series.update)
+// Add new serie
+router.post("/:seriesID", series.createSeries);
 
-    // Retrieve all series
-    app.get("/series", series.getAll);
+// Remove a serie
+router.delete("/:seriesID", series.removeSeries);
 
-    // Retrieve series by its ID
-    app.get("/series/:seriesId", series.getSpecific);
+// Retrieve all series
+router.get("/", series.getAllSeries);
 
-    // Remove all series
-    app.delete("/series", series.deleteAll);
-    
-    // Remove a specific series by its ID
-    app.delete("/series/:seriesId", series.delete);
-};
+//Retrieve a serie with certain ID 
+router.get("/:seriesID", series.getSerieByItsID);
+
+//Update serie using its ID
+router.put("/:seriesID", series.updateSeries);
+
+module.exports = router;
+

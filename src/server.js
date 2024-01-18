@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const AuthRoutes = require('./routes/auth.routes');
+const MovieRoutes = require('./routes/movie.routes');
+const SeriesRoutes = require('./routes/series.routes');
 
 class Server {
     constructor() {
@@ -16,6 +18,9 @@ class Server {
 
     setupRoutes() {
         this.server.use('/auth', AuthRoutes);
+        this.server.use('/movie', MovieRoutes);
+        this.server.use('/series', SeriesRoutes);
+        
     }
 
     start() {
