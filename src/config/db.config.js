@@ -10,6 +10,15 @@ class DB {
             database: 'netflix',
         });
 
+       /* // Connection pool
+        this.pool = mysql.createPool({
+            host: '127.0.0.1',
+            port: 3306,
+            user: 'root',
+            password: 'qwerty',
+            database: 'netflix',
+        });*/
+
         this.connection.connect((err) => {
             if (err) {
                 console.error('MySQL connection failed: ' + err.stack);
