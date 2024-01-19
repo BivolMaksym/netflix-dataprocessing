@@ -22,7 +22,7 @@ class WatchlistSeriesService {
     }
 
     async deleteWatchlistSeries(watchlistSeriesID) {
-        await this.db.query('DELETE FROM WatchlistSeries WHERE WatchlistSeriesID = ?', [watchlistSeriesID]);
+        await this.db.query('DELETE FROM WatchlistSeries WHERE SeriesID = ?', [watchlistSeriesID]);
     }
 }
 
