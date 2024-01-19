@@ -1,10 +1,15 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const AuthRoutes = require('./routes/auth.routes');
-const watchlistRoutes = require('./routes/watchlistRoutes');
-const watchlistMovieRoutes = require('./routes/watchlistMovieRoutes');
-const watchlistSeriesRoutes = require('./routes/watchlistSeriesRoutes');
-const subscriptionRoutes = require('./routes/subscriptionRoutes');
+// <<<<<<< alikhan
+// const MovieRoutes = require('./routes/movie.routes');
+// const SeriesRoutes = require('./routes/series.routes');
+// =======
+// const watchlistRoutes = require('./routes/watchlistRoutes');
+// const watchlistMovieRoutes = require('./routes/watchlistMovieRoutes');
+// const watchlistSeriesRoutes = require('./routes/watchlistSeriesRoutes');
+// const subscriptionRoutes = require('./routes/subscriptionRoutes');
+// >>>>>>> main
 
 class Server {
     constructor() {
@@ -20,10 +25,16 @@ class Server {
 
     setupRoutes() {
         this.server.use('/auth', AuthRoutes);
-        this.server.use('/subscriptions', subscriptionRoutes);
-        this.server.use('/watchlist', watchlistRoutes);
-        this.server.use('/watchlistMovie', watchlistMovieRoutes);
-        this.server.use('/watchlistSeries', watchlistSeriesRoutes);
+// <<<<<<< alikhan
+//         this.server.use('/movie', MovieRoutes);
+//         this.server.use('/series', SeriesRoutes);
+        
+// =======
+//         this.server.use('/subscriptions', subscriptionRoutes);
+//         this.server.use('/watchlist', watchlistRoutes);
+//         this.server.use('/watchlistMovie', watchlistMovieRoutes);
+//         this.server.use('/watchlistSeries', watchlistSeriesRoutes);
+// >>>>>>> main
     }
 
     start() {
