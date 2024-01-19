@@ -21,7 +21,7 @@ class WatchlistMovieService {
     }
 
     async deleteWatchlistMovie(watchlistMovieID) {
-        await this.db.query('DELETE FROM WatchlistMovie WHERE WatchlistMovieID = ?', [watchlistMovieID]);
+        await this.db.query('DELETE FROM WatchlistMovie WHERE MovieID = ?', [watchlistMovieID]);
     }
 }
 

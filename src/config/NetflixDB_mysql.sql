@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Янв 18 2024 г., 12:49
+-- Время создания: Янв 19 2024 г., 07:43
 -- Версия сервера: 11.2.2-MariaDB-1:11.2.2+maria~ubu2204
 -- Версия PHP: 8.2.14
 
@@ -117,7 +117,7 @@ CREATE TABLE `Profile` (
 --
 
 INSERT INTO `Profile` (`ProfileID`, `UserID`, `ClassificationID`, `WatchlistID`, `ProfileName`, `ProfilePhoto`, `Age`, `Language`) VALUES
-(1, NULL, NULL, 24, 'Maksym', 1, 18, 'English');
+(1, NULL, NULL, 28, 'Maksym', 1, 18, 'English');
 
 -- --------------------------------------------------------
 
@@ -166,7 +166,7 @@ CREATE TABLE `Subscription` (
 --
 
 INSERT INTO `Subscription` (`SubscriptionID`, `UserID`, `Description`, `Price`, `Quality`, `SignUpDate`, `FriendInvited`, `IsPaidAccount`) VALUES
-(3, 2, 'abracadabra123', 120, 'HD', '2024-01-15', 1, 2);
+(10, 2, 'agd', 2012, 'HD', '2022-06-24', 1, 0);
 
 -- --------------------------------------------------------
 
@@ -202,7 +202,7 @@ INSERT INTO `User` (`UserID`, `SubscriptionID`, `Username`, `Email`, `Password`,
 
 CREATE TABLE `Watchlist` (
   `WatchlistID` int(11) NOT NULL,
-  `ProfileID` int(11) DEFAULT NULL,
+  `ProfileID` int(11) NOT NULL,
   `dateAdded` date DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -211,7 +211,7 @@ CREATE TABLE `Watchlist` (
 --
 
 INSERT INTO `Watchlist` (`WatchlistID`, `ProfileID`, `dateAdded`) VALUES
-(24, 1, '2024-01-16');
+(28, 1, '2024-01-19');
 
 -- --------------------------------------------------------
 
@@ -225,13 +225,6 @@ CREATE TABLE `WatchlistMovie` (
   `MovieID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Дамп данных таблицы `WatchlistMovie`
---
-
-INSERT INTO `WatchlistMovie` (`WatchlistMovieID`, `WatchlistID`, `MovieID`) VALUES
-(2, 24, 1);
-
 -- --------------------------------------------------------
 
 --
@@ -243,13 +236,6 @@ CREATE TABLE `WatchlistSeries` (
   `WatchlistID` int(11) NOT NULL,
   `SeriesID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Дамп данных таблицы `WatchlistSeries`
---
-
-INSERT INTO `WatchlistSeries` (`WatchlistSeriesID`, `WatchlistID`, `SeriesID`) VALUES
-(2, 24, 1);
 
 --
 -- Индексы сохранённых таблиц
@@ -378,7 +364,7 @@ ALTER TABLE `Series`
 -- AUTO_INCREMENT для таблицы `Subscription`
 --
 ALTER TABLE `Subscription`
-  MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `SubscriptionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT для таблицы `User`
@@ -390,13 +376,13 @@ ALTER TABLE `User`
 -- AUTO_INCREMENT для таблицы `Watchlist`
 --
 ALTER TABLE `Watchlist`
-  MODIFY `WatchlistID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `WatchlistID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistMovie`
 --
 ALTER TABLE `WatchlistMovie`
-  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistSeries`

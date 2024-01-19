@@ -43,8 +43,14 @@ class WatchlistController {
 
     deleteWatchlist = async (req, res) => {
         const watchlistID = req.params.id;
+
         try {
+            // Update profiles to remove the association with the watchlist
+            await this.watchlistService.deleteWatchlistInProfile(watchlistID);
+
+            // Delete the watchlist
             await this.watchlistService.deleteWatchlist(watchlistID);
+
             res.status(200).send('Watchlist deleted successfully!');
         } catch (error) {
             console.error('Error deleting watchlist: ' + error.message);
