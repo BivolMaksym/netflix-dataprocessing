@@ -9,9 +9,9 @@ class Movie {
         
         try {
             await this.movieService.createMovie(movieID);
-            const {movieID, genreID, classificationID, movieTitle, movieDescription, amountOfViews, releaseDate, genre, availableQualities} = req.body;
+            const {movieID, classificationID, movieTitle, movieDescription, amountOfViews, releaseDate, genre, availableQualities} = req.body;
             
-            if(!movieID || !genreID || !classificationID || !movieTitle || !movieDescription || !amountOfViews || !releaseDate || !genre || !availableQualities) {
+            if(!movieID || !classificationID || !movieTitle || !movieDescription || !amountOfViews || !releaseDate || !genre || !availableQualities) {
                 return res.status(400).send("Missing information for creating new movie.")
             } 
             res.status(200).send("Movie added successfully")
