@@ -7,8 +7,10 @@ const watchlistRoutes = require('./routes/watchlistRoutes');
 const watchlistMovieRoutes = require('./routes/watchlistMovieRoutes');
 const watchlistSeriesRoutes = require('./routes/watchlistSeriesRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
+
 const ClassificiationRoutes = require('./routes/classification.routes');
 const cors = require('cors');
+const profileRoutes = require('./routes/profileRoutes');
 
 
 class Server {
@@ -33,6 +35,7 @@ class Server {
         this.server.use('/watchlist', watchlistRoutes);
         this.server.use('/watchlistMovie', watchlistMovieRoutes);
         this.server.use('/watchlistSeries', watchlistSeriesRoutes);
+        this.server.use('/profile', profileRoutes);
         this.server.use('/classification', ClassificiationRoutes);
     }
 
