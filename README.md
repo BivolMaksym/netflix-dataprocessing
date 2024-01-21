@@ -1,5 +1,11 @@
 # netflix-dataprocessing
-This is repository for period 2 year 2 assignment
+This is the repository for the assignment of dataprocessing in the period 2 of year 2.
+
+Made by:
+- Alikhan Smagulov 5220378
+- Maksym Bivol 5215951
+- Ian Donker 4629981
+
 ## How to run the back-end
 1. Open the folder in IDE, navigate to netflix-dataprocessing folder (cd netflix-dataprocessing).
 2. type "npm install"
@@ -30,5 +36,6 @@ Routes for signing up, logging in and checking the authentication.
     Login returns JWT token in JSON body which is used for the next route
     Protected page - "http://localhost:3000/auth/protected" Expects Bearer Token
     Auth > Bearer Token
-    
+
+##
 
