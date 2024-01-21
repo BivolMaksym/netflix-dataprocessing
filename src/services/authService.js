@@ -17,7 +17,6 @@ class AuthService {
     async signup(username, password, role = 'user') {
         const usernameAlreadyExists = await this.userNameExists(username);
         const db = this.db;
-        console.log('signup');
         if (usernameAlreadyExists) {
             throw new Error('Username already exists. Please choose a different username.');
         }
@@ -98,7 +97,7 @@ class AuthService {
                 return user;
 
             } else {
-                console.log('user niet gevonden / of meerder users gevonden');
+                console.log('User not found/Multiple users found.');
             }
         });
 
