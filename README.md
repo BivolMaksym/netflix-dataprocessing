@@ -19,6 +19,7 @@ Made by:
 4. type npm start
 5. the back-end is hoted on port 4000, a browser should pop up.
 
+##
 
 Routes for signing up, logging in and checking the authentication.
 
@@ -37,5 +38,6 @@ Routes for signing up, logging in and checking the authentication.
     Protected page - "http://localhost:3000/auth/protected" Expects Bearer Token
     Auth > Bearer Token
 
-##
+## ERD of the database
+![ERD](Netflix_ERD.png "ER")
 
