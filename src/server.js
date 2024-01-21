@@ -8,8 +8,11 @@ const watchlistMovieRoutes = require('./routes/watchlistMovieRoutes');
 const watchlistSeriesRoutes = require('./routes/watchlistSeriesRoutes');
 const subscriptionRoutes = require('./routes/subscriptionRoutes');
 const ClassificiationRoutes = require('./routes/classification.routes');
+const cors = require('cors');
+
 
 class Server {
+
     constructor() {
         this.server = express();
         this.port = 3000;
@@ -19,6 +22,7 @@ class Server {
 
     setupMiddleWare() {
         this.server.use(bodyParser.json());
+        this.server.use(cors());
     }
 
     setupRoutes() {
@@ -40,4 +44,5 @@ class Server {
 }
 
 const server = new Server();
+
 server.start();

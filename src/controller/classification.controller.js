@@ -75,7 +75,7 @@ class Classification {
 
 }
 
-module.exports = Movie;
+module.exports = Classification;
 
 
 
