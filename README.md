@@ -38,6 +38,25 @@ Routes for signing up, logging in and checking the authentication.
     Protected page - "http://localhost:3000/auth/protected" Expects Bearer Token
     Auth > Bearer Token
 
+Routes for movies and series.
+
+Creating - "https://localhost:3000/movie"(for series is the same, but you change the key "movie" to "series") Expects JSON body :
+{
+ "movieID": "",
+ "classificationID": "",
+ "movieTitle": "",
+ "movieDescription": "",
+ "amountOfViews": "",
+ "releaseDate": "",
+ "genre": "",
+ availableQualities: ""
+}
+
+Deleting - "https://localhost:3000/movie"(for series you change movieID to seriesID Expects JSON body : 
+{
+ "movieID": ""
+}
+
 ## ERD of the database
 ![ERD](Netflix_ERD.png "ERD")
 
