@@ -39,5 +39,5 @@ Routes for signing up, logging in and checking the authentication.
     Auth > Bearer Token
 
 ## ERD of the database
-![ERD](Netflix_ERD.png "ER")
+![ERD](Netflix_ERD.png "ERD")
 
