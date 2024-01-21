@@ -5,10 +5,10 @@ const router = express.Router();
 const movie = new Movie();
 
 // Add new movie 
-router.post("/:movieID", movie.createMovie);
+router.post("/", movie.createMovie);
 
 // Remove a movie
-router.delete("/:movieID", movie.removeMovie);
+router.delete("/", movie.removeMovie);
 
 // Retrieve all movies
 router.get("/", movie.getAllMovies);

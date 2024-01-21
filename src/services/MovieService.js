@@ -6,7 +6,7 @@ class MovieService {
         this.db = new DB();
     }
 
-    async createMovie (movieID, newMovie) {
+    async createMovie (newMovie) {
         await this.db.query('INSERT INTO Movie (MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [newMovie.movieID, newMovie.ClassificationID, newMovie.MovieTitle, newMovie.MovieDescription, newMovie.AmountOfViews, newMovie.ReleaseDate, newMovie.Genre, newMovie.AvailableQualities]);
     }
 

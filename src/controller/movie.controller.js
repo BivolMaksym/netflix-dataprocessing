@@ -6,17 +6,18 @@ class Movie {
     }
 
     createMovie = async (req, res) => {
+        const newMovie = req.body;
         
         try {
-            await this.movieService.createMovie(movieID);
-            const {movieID, classificationID, movieTitle, movieDescription, amountOfViews, releaseDate, genre, availableQualities} = req.body;
+            await this.movieService.createMovie(newMovie);
+            const {MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities} = req.body;
             
-            if(!movieID || !classificationID || !movieTitle || !movieDescription || !amountOfViews || !releaseDate || !genre || !availableQualities) {
-                return res.status(400).send("Missing information for creating new movie.")
-            } 
+            // if(!MovieID || !ClassificationID || !MovieTitle || !MovieDescription || !AmountOfViews || !ReleaseDate || !Genre || !AvailableQualities) {
+            //     return res.status(400).send("Missing information for creating new movie.")
+            // } 
             res.status(200).send("Movie added successfully")
         }  catch (err) {
-            console.err('Error creating a movie:', err);
+            console.error('Error creating a movie:', err);
             res.status(500).send("Internal server error");
         }
         
