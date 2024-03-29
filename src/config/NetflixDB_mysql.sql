@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Янв 19 2024 г., 07:43
--- Версия сервера: 11.2.2-MariaDB-1:11.2.2+maria~ubu2204
--- Версия PHP: 8.2.14
+-- Время создания: Мар 29 2024 г., 19:21
+-- Версия сервера: 10.9.2-MariaDB-1:10.9.2+maria~ubu2204
+-- Версия PHP: 8.0.23
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,30 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `Category_enums`
---
-
-CREATE TABLE `Category_enums` (
-  `CategoryID` int(11) NOT NULL,
-  `age` int(3) DEFAULT NULL,
-  `violence` int(1) DEFAULT NULL,
-  `sex` int(1) DEFAULT NULL,
-  `terror` int(1) DEFAULT NULL,
-  `discrimination` int(1) DEFAULT NULL,
-  `drugabuse` int(1) DEFAULT NULL,
-  `courselang` int(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Дамп данных таблицы `Category_enums`
---
-
-INSERT INTO `Category_enums` (`CategoryID`, `age`, `violence`, `sex`, `terror`, `discrimination`, `drugabuse`, `courselang`) VALUES
-(1, 12, 0, 0, 0, 0, 0, 0);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `Classification`
 --
 
@@ -58,18 +34,7 @@ CREATE TABLE `Classification` (
   `PreferedGenres` varchar(10) DEFAULT NULL,
   `MinimumAge` varchar(10) DEFAULT NULL,
   `ViewingClassification` int(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Структура таблицы `Genre`
---
-
-CREATE TABLE `Genre` (
-  `GenreID` int(11) NOT NULL,
-  `Genre` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -86,7 +51,7 @@ CREATE TABLE `Movie` (
   `ReleaseDate` date DEFAULT NULL,
   `Genre` varchar(50) DEFAULT NULL,
   `AvailableQualities` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `Movie`
@@ -110,7 +75,7 @@ CREATE TABLE `Profile` (
   `ProfilePhoto` tinyint(4) DEFAULT NULL,
   `Age` int(11) DEFAULT NULL,
   `Language` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `Profile`
@@ -135,7 +100,7 @@ CREATE TABLE `Series` (
   `ReleaseDate` date DEFAULT NULL,
   `Genre` varchar(50) DEFAULT NULL,
   `availableQualities` varchar(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `Series`
@@ -159,7 +124,7 @@ CREATE TABLE `Subscription` (
   `SignUpDate` date DEFAULT current_timestamp(),
   `FriendInvited` tinyint(4) DEFAULT NULL,
   `IsPaidAccount` tinyint(4) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `Subscription`
@@ -185,7 +150,7 @@ CREATE TABLE `User` (
   `BlockStatus` tinyint(4) DEFAULT NULL,
   `FreeDaysLeft` int(11) DEFAULT NULL,
   `role` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `User`
@@ -204,7 +169,7 @@ CREATE TABLE `Watchlist` (
   `WatchlistID` int(11) NOT NULL,
   `ProfileID` int(11) NOT NULL,
   `dateAdded` date DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `Watchlist`
@@ -223,7 +188,7 @@ CREATE TABLE `WatchlistMovie` (
   `WatchlistMovieID` int(11) NOT NULL,
   `WatchlistID` int(11) NOT NULL,
   `MovieID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -235,17 +200,11 @@ CREATE TABLE `WatchlistSeries` (
   `WatchlistSeriesID` int(11) NOT NULL,
   `WatchlistID` int(11) NOT NULL,
   `SeriesID` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Индексы сохранённых таблиц
 --
-
---
--- Индексы таблицы `Category_enums`
---
-ALTER TABLE `Category_enums`
-  ADD PRIMARY KEY (`CategoryID`);
 
 --
 -- Индексы таблицы `Classification`
@@ -253,12 +212,6 @@ ALTER TABLE `Category_enums`
 ALTER TABLE `Classification`
   ADD PRIMARY KEY (`ClassificationID`),
   ADD KEY `ViewingClassification` (`ViewingClassification`);
-
---
--- Индексы таблицы `Genre`
---
-ALTER TABLE `Genre`
-  ADD PRIMARY KEY (`GenreID`);
 
 --
 -- Индексы таблицы `Movie`
@@ -294,8 +247,7 @@ ALTER TABLE `Subscription`
 -- Индексы таблицы `User`
 --
 ALTER TABLE `User`
-  ADD PRIMARY KEY (`UserID`),
-  ADD KEY `SubscriptionID` (`SubscriptionID`);
+  ADD PRIMARY KEY (`UserID`);
 
 --
 -- Индексы таблицы `Watchlist`
@@ -325,22 +277,10 @@ ALTER TABLE `WatchlistSeries`
 --
 
 --
--- AUTO_INCREMENT для таблицы `Category_enums`
---
-ALTER TABLE `Category_enums`
-  MODIFY `CategoryID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT для таблицы `Classification`
 --
 ALTER TABLE `Classification`
   MODIFY `ClassificationID` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT для таблицы `Genre`
---
-ALTER TABLE `Genre`
-  MODIFY `GenreID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT для таблицы `Movie`
@@ -425,12 +365,6 @@ ALTER TABLE `Series`
 --
 ALTER TABLE `Subscription`
   ADD CONSTRAINT `Subscription_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `User` (`UserID`);
-
---
--- Ограничения внешнего ключа таблицы `User`
---
-ALTER TABLE `User`
-  ADD CONSTRAINT `User_ibfk_1` FOREIGN KEY (`SubscriptionID`) REFERENCES `Subscription` (`SubscriptionID`);
 
 --
 -- Ограничения внешнего ключа таблицы `Watchlist`
