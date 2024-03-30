@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Мар 29 2024 г., 19:21
+-- Время создания: Мар 30 2024 г., 16:18
 -- Версия сервера: 10.9.2-MariaDB-1:10.9.2+maria~ubu2204
 -- Версия PHP: 8.0.23
 
@@ -21,6 +21,240 @@ SET time_zone = "+00:00";
 -- База данных: `netflix`
 --
 
+DELIMITER $$
+--
+-- Процедуры
+--
+CREATE DEFINER=`root`@`%` PROCEDURE `create_classification` (`in_ClassificationID` INT, `in_InterestedInFilms` TINYINT, `in_InterestedInSeries` TINYINT, `in_PreferedGenres` VARCHAR(10), `in_MinAge` VARCHAR(10), `in_ViewingClassification` INT)   BEGIN
+    INSERT INTO Classification (ClassificationID, InterestedInFilms, InterestedInSeries, PreferedGenres, MinAge, ViewingClassification)
+    VALUES (in_ClassificationID, in_InterestedInFilms, in_InterestedInSeries, in_PreferedGenres, in_MinAge, in_ViewingClassification);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_movie` (IN `p_MovieID` INT, IN `p_ClassificationID` INT, IN `p_MovieTitle` VARCHAR(50), IN `p_MovieDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    INSERT INTO Movie (MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_MovieID, p_ClassificationID, p_MovieTitle, p_MovieDescription, p_AmountOfViews, p_ReleaseDate, p_Genre, p_AvailableQualities);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_profile` (IN `p_UserID` INT, IN `p_WatchlistID` INT, IN `p_ProfileName` VARCHAR(50), IN `p_ProfilePhoto` TINYINT, IN `p_Age` INT, IN `p_Language` VARCHAR(50))   BEGIN
+    -- Validate Profile
+    IF p_Age <= 0 OR p_Age > 170 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid age. Age must be between 1 and 170.';
+    END IF;
+
+    IF NOT p_ProfileName REGEXP '^[a-zA-Z0-9\s]*$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name. Profile name must not contain special characters.';
+    END IF;
+
+    IF LENGTH(p_ProfileName) > 30 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name length. Profile name must not exceed 30 characters.';
+    END IF;
+
+    -- Check Profile Limit
+    IF (SELECT COUNT(*) FROM Profile WHERE UserID = p_UserID) >= 4 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User has reached the maximum allowed number of profiles (4).';
+    END IF;
+
+    -- Insert Profile
+    INSERT INTO Profile (UserID, WatchlistID, ProfileName, ProfilePhoto, Age, Language)
+    VALUES (p_UserID, p_WatchlistID, p_ProfileName, p_ProfilePhoto, p_Age, p_Language);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_series` (IN `p_SeriesID` INT, IN `p_ClassificationID` INT, IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    INSERT INTO Series (SeriesID, ClassificationID, SeriesTitle, SeriesDescription, AmountOfViews, AmountOfEpisodes, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_SeriesID, p_ClassificationID, p_SeriesTitle, p_SeriesDescription, p_AmountOfViews, p_AmountOfEpisodes, p_ReleaseDate, p_Genre, p_AvailableQualities);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_subscription` (IN `userID` INT, IN `subscriptionDescription` VARCHAR(50), IN `subscriptionPrice` DOUBLE, IN `subscriptionQuality` VARCHAR(2), IN `signUpDate` DATE, IN `friendInvited` TINYINT, IN `isPaidAccount` TINYINT)   BEGIN
+    INSERT INTO Subscription (UserID, Description, Price, Quality, SignUpDate, FriendInvited, IsPaidAccount)
+    VALUES (userID, subscriptionDescription, subscriptionPrice, subscriptionQuality, signUpDate, friendInvited, isPaidAccount);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_watchlist` (IN `profileID` INT, OUT `newWatchlistID` INT)   BEGIN
+    -- Insert a new watchlist
+    INSERT INTO Watchlist (ProfileID) VALUES (profileID);
+    SET newWatchlistID = LAST_INSERT_ID();
+
+    -- Update the Profile table with the new WatchlistID
+    UPDATE Profile SET WatchlistID = newWatchlistID WHERE ProfileID = profileID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_watchlist_movie` (IN `watchlistID` INT, IN `movieID` INT)   BEGIN
+    INSERT INTO WatchlistMovie (WatchlistID, MovieID) VALUES (watchlistID, movieID);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `create_watchlist_series` (IN `watchlistID` INT, IN `seriesID` INT)   BEGIN
+    INSERT INTO WatchlistSeries (WatchlistID, SeriesID) VALUES (watchlistID, seriesID);
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_profile` (IN `p_ProfileID` INT)   BEGIN
+    DELETE FROM Profile WHERE ProfileID = p_ProfileID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_series` (IN `p_SeriesID` INT)   BEGIN
+    DELETE FROM Series WHERE SeriesID = p_SeriesID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_subscription` (IN `userID` INT)   BEGIN
+    DELETE FROM Subscription WHERE UserID = userID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_watchlist` (IN `watchlistID` INT)   BEGIN
+    -- Remove rows from WatchlistMovie associated with the watchlist
+    DELETE FROM WatchlistMovie WHERE WatchlistID = watchlistID;
+
+    -- Remove rows from WatchlistSeries associated with the watchlist
+    DELETE FROM WatchlistSeries WHERE WatchlistID = watchlistID;
+
+    -- Delete the watchlist
+    DELETE FROM Watchlist WHERE WatchlistID = watchlistID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_watchlist_movie` (IN `watchlistMovieID` INT)   BEGIN
+    DELETE FROM WatchlistMovie WHERE WatchlistMovieID = watchlistMovieID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `delete_watchlist_series` (IN `watchlistSeriesID` INT)   BEGIN
+    DELETE FROM WatchlistSeries WHERE WatchlistSeriesID = watchlistSeriesID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_classifications` ()   BEGIN
+    SELECT * FROM Classification;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_movies` ()   BEGIN
+    SELECT * FROM Movie;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_profiles` ()   BEGIN
+    SELECT * FROM Profile;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_series` ()   BEGIN
+    SELECT * FROM Series;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_subscriptions` ()   BEGIN
+    SELECT * FROM Subscription;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_watchlists` ()   BEGIN
+    SELECT * FROM Watchlist;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_watchlist_movies` ()   BEGIN
+    SELECT * FROM WatchlistMovie;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_all_watchlist_series` ()   BEGIN
+    SELECT * FROM WatchlistSeries;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_classification_by_id` (`in_ClassificationID` INT)   BEGIN
+    SELECT * FROM Classification WHERE ClassificationID = in_ClassificationID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_movie_by_id` (IN `p_MovieID` INT)   BEGIN
+    SELECT * FROM Movie WHERE MovieID = p_MovieID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_profile_by_id` (IN `p_ProfileID` INT)   BEGIN
+    SELECT * FROM Profile WHERE ProfileID = p_ProfileID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_series_by_id` (IN `p_SeriesID` INT)   BEGIN
+    SELECT * FROM Series WHERE SeriesID = p_SeriesID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_subscription_by_user_id` (IN `userID` INT)   BEGIN
+    SELECT * FROM Subscription WHERE UserID = userID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_watchlist_by_id` (IN `watchlistID` INT)   BEGIN
+    SELECT * FROM Watchlist WHERE WatchlistID = watchlistID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_watchlist_movie_by_id` (IN `watchlistMovieID` INT)   BEGIN
+    SELECT * FROM WatchlistMovie WHERE WatchlistMovieID = watchlistMovieID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_watchlist_series_by_id` (IN `watchlistSeriesID` INT)   BEGIN
+    SELECT * FROM WatchlistSeries WHERE WatchlistSeriesID = watchlistSeriesID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `remove_classification` (`in_ClassificationID` INT)   BEGIN
+    DELETE FROM Classification WHERE ClassificationID = in_ClassificationID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `remove_movie` (IN `p_MovieID` INT)   BEGIN
+    DELETE FROM Movie WHERE MovieID = p_MovieID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `update_classification` (`in_ClassificationID` INT, `in_InterestedInFilms` TINYINT, `in_InterestedInSeries` TINYINT, `in_PreferedGenres` VARCHAR(10), `in_MinAge` VARCHAR(10), `in_ViewingClassification` INT)   BEGIN
+    UPDATE Classification
+    SET InterestedInFilms = in_InterestedInFilms,
+        InterestedInSeries = in_InterestedInSeries,
+        PreferedGenres = in_PreferedGenres,
+        MinAge = in_MinAge,
+        ViewingClassification = in_ViewingClassification
+    WHERE ClassificationID = in_ClassificationID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `update_movie` (IN `p_MovieID` INT, IN `p_ClassificationID` INT, IN `p_MovieTitle` VARCHAR(50), IN `p_MovieDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    UPDATE Movie
+    SET ClassificationID = p_ClassificationID,
+        MovieTitle = p_MovieTitle,
+        MovieDescription = p_MovieDescription,
+        AmountOfViews = p_AmountOfViews,
+        ReleaseDate = p_ReleaseDate,
+        Genre = p_Genre,
+        AvailableQualities = p_AvailableQualities
+    WHERE MovieID = p_MovieID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `update_profile` (IN `p_ProfileID` INT, IN `p_ProfileName` VARCHAR(50), IN `p_ProfilePhoto` TINYINT, IN `p_Age` INT, IN `p_Language` VARCHAR(50))   BEGIN
+    -- Validate Profile
+    IF p_Age <= 0 OR p_Age > 170 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid age. Age must be between 1 and 170.';
+    END IF;
+
+    IF NOT p_ProfileName REGEXP '^[a-zA-Z0-9\s]*$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name. Profile name must not contain special characters.';
+    END IF;
+
+    IF LENGTH(p_ProfileName) > 30 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name length. Profile name must not exceed 30 characters.';
+    END IF;
+
+    -- Update Profile
+    UPDATE Profile
+    SET ProfileName = p_ProfileName,
+        ProfilePhoto = p_ProfilePhoto,
+        Age = p_Age,
+        Language = p_Language
+    WHERE ProfileID = p_ProfileID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `update_series` (IN `p_SeriesID` INT, IN `p_ClassificationID` INT, IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    UPDATE Series
+    SET ClassificationID = p_ClassificationID,
+        SeriesTitle = p_SeriesTitle,
+        SeriesDescription = p_SeriesDescription,
+        AmountOfViews = p_AmountOfViews,
+        AmountOfEpisodes = p_AmountOfEpisodes,
+        ReleaseDate = p_ReleaseDate,
+        Genre = p_Genre,
+        AvailableQualities = p_AvailableQualities
+    WHERE SeriesID = p_SeriesID;
+END$$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `update_subscription` (IN `userID` INT, IN `subscriptionDescription` VARCHAR(50), IN `subscriptionPrice` DOUBLE, IN `subscriptionQuality` VARCHAR(2), IN `signUpDate` DATE, IN `friendInvited` TINYINT, IN `isPaidAccount` TINYINT)   BEGIN
+    UPDATE Subscription 
+    SET Description = subscriptionDescription, Price = subscriptionPrice, Quality = subscriptionQuality, SignUpDate = signUpDate, FriendInvited = friendInvited, IsPaidAccount = isPaidAccount
+    WHERE UserID = userID;
+END$$
+
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -35,6 +269,23 @@ CREATE TABLE `Classification` (
   `MinimumAge` varchar(10) DEFAULT NULL,
   `ViewingClassification` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Дублирующая структура для представления `ClassificationInformation`
+-- (См. Ниже фактическое представление)
+--
+CREATE TABLE `ClassificationInformation` (
+`ClassificationID` int(11)
+,`InterestedInFilms` tinyint(4)
+,`InterestedInSeries` tinyint(4)
+,`PreferedGenres` varchar(10)
+,`MinimumAge` varchar(10)
+,`ViewingClassification` int(10)
+,`ProfileID` int(11)
+,`ProfileName` varchar(50)
+);
 
 -- --------------------------------------------------------
 
@@ -58,7 +309,8 @@ CREATE TABLE `Movie` (
 --
 
 INSERT INTO `Movie` (`MovieID`, `ClassificationID`, `MovieTitle`, `MovieDescription`, `AmountOfViews`, `ReleaseDate`, `Genre`, `AvailableQualities`) VALUES
-(1, NULL, '123123', '123123123', 123123321, '2024-01-02', NULL, '123');
+(1, NULL, '123123', '123123123', 123123321, '2024-01-02', NULL, '123'),
+(2, NULL, 'agsaasd', 'asdsadg', 1231, '2024-01-02', NULL, '123');
 
 -- --------------------------------------------------------
 
@@ -83,6 +335,20 @@ CREATE TABLE `Profile` (
 
 INSERT INTO `Profile` (`ProfileID`, `UserID`, `ClassificationID`, `WatchlistID`, `ProfileName`, `ProfilePhoto`, `Age`, `Language`) VALUES
 (1, NULL, NULL, 28, 'Maksym', 1, 18, 'English');
+
+-- --------------------------------------------------------
+
+--
+-- Дублирующая структура для представления `ProfileWatchlistContent`
+-- (См. Ниже фактическое представление)
+--
+CREATE TABLE `ProfileWatchlistContent` (
+`ProfileID` int(11)
+,`ProfileName` varchar(50)
+,`WatchlistID` int(11)
+,`MovieTitle` varchar(50)
+,`SeriesTitle` varchar(50)
+);
 
 -- --------------------------------------------------------
 
@@ -162,6 +428,46 @@ INSERT INTO `User` (`UserID`, `SubscriptionID`, `Username`, `Email`, `Password`,
 -- --------------------------------------------------------
 
 --
+-- Дублирующая структура для представления `UserProfileInformation`
+-- (См. Ниже фактическое представление)
+--
+CREATE TABLE `UserProfileInformation` (
+`UserID` int(11)
+,`Username` varchar(50)
+,`Email` varchar(50)
+,`ActivationStatus` tinyint(4)
+,`LoginAttempts` int(11)
+,`BlockStatus` tinyint(4)
+,`FreeDaysLeft` int(11)
+,`role` varchar(50)
+,`ProfileID` int(11)
+,`ProfilePhoto` tinyint(4)
+,`Age` int(11)
+,`Language` varchar(50)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Дублирующая структура для представления `UserSubscriptionDetails`
+-- (См. Ниже фактическое представление)
+--
+CREATE TABLE `UserSubscriptionDetails` (
+`UserID` int(11)
+,`Username` varchar(50)
+,`Email` varchar(50)
+,`SubscriptionID` int(11)
+,`Description` varchar(50)
+,`Price` double
+,`Quality` varchar(2)
+,`SignUpDate` date
+,`FriendInvited` tinyint(4)
+,`IsPaidAccount` tinyint(4)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Структура таблицы `Watchlist`
 --
 
@@ -190,6 +496,14 @@ CREATE TABLE `WatchlistMovie` (
   `MovieID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Дамп данных таблицы `WatchlistMovie`
+--
+
+INSERT INTO `WatchlistMovie` (`WatchlistMovieID`, `WatchlistID`, `MovieID`) VALUES
+(5, 28, 1),
+(6, 28, 2);
+
 -- --------------------------------------------------------
 
 --
@@ -201,6 +515,42 @@ CREATE TABLE `WatchlistSeries` (
   `WatchlistID` int(11) NOT NULL,
   `SeriesID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Структура для представления `ClassificationInformation`
+--
+DROP TABLE IF EXISTS `ClassificationInformation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `ClassificationInformation`  AS SELECT `c`.`ClassificationID` AS `ClassificationID`, `c`.`InterestedInFilms` AS `InterestedInFilms`, `c`.`InterestedInSeries` AS `InterestedInSeries`, `c`.`PreferedGenres` AS `PreferedGenres`, `c`.`MinimumAge` AS `MinimumAge`, `c`.`ViewingClassification` AS `ViewingClassification`, `p`.`ProfileID` AS `ProfileID`, `p`.`ProfileName` AS `ProfileName` FROM (`Classification` `c` join `Profile` `p` on(`c`.`ClassificationID` = `p`.`ClassificationID`))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура для представления `ProfileWatchlistContent`
+--
+DROP TABLE IF EXISTS `ProfileWatchlistContent`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `ProfileWatchlistContent`  AS SELECT `p`.`ProfileID` AS `ProfileID`, `p`.`ProfileName` AS `ProfileName`, `w`.`WatchlistID` AS `WatchlistID`, `m`.`MovieTitle` AS `MovieTitle`, `s`.`SeriesTitle` AS `SeriesTitle` FROM (((((`Profile` `p` join `Watchlist` `w` on(`p`.`WatchlistID` = `w`.`WatchlistID`)) left join `WatchlistMovie` `wm` on(`w`.`WatchlistID` = `wm`.`WatchlistID`)) left join `Movie` `m` on(`wm`.`MovieID` = `m`.`MovieID`)) left join `WatchlistSeries` `ws` on(`w`.`WatchlistID` = `ws`.`WatchlistID`)) left join `Series` `s` on(`ws`.`SeriesID` = `s`.`SeriesID`))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура для представления `UserProfileInformation`
+--
+DROP TABLE IF EXISTS `UserProfileInformation`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `UserProfileInformation`  AS SELECT `u`.`UserID` AS `UserID`, `u`.`Username` AS `Username`, `u`.`Email` AS `Email`, `u`.`ActivationStatus` AS `ActivationStatus`, `u`.`LoginAttempts` AS `LoginAttempts`, `u`.`BlockStatus` AS `BlockStatus`, `u`.`FreeDaysLeft` AS `FreeDaysLeft`, `u`.`role` AS `role`, `p`.`ProfileID` AS `ProfileID`, `p`.`ProfilePhoto` AS `ProfilePhoto`, `p`.`Age` AS `Age`, `p`.`Language` AS `Language` FROM (`User` `u` join `Profile` `p` on(`u`.`UserID` = `p`.`UserID`))  ;
+
+-- --------------------------------------------------------
+
+--
+-- Структура для представления `UserSubscriptionDetails`
+--
+DROP TABLE IF EXISTS `UserSubscriptionDetails`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `UserSubscriptionDetails`  AS SELECT `u`.`UserID` AS `UserID`, `u`.`Username` AS `Username`, `u`.`Email` AS `Email`, `s`.`SubscriptionID` AS `SubscriptionID`, `s`.`Description` AS `Description`, `s`.`Price` AS `Price`, `s`.`Quality` AS `Quality`, `s`.`SignUpDate` AS `SignUpDate`, `s`.`FriendInvited` AS `FriendInvited`, `s`.`IsPaidAccount` AS `IsPaidAccount` FROM (`User` `u` join `Subscription` `s` on(`u`.`SubscriptionID` = `s`.`SubscriptionID`))  ;
 
 --
 -- Индексы сохранённых таблиц
@@ -286,7 +636,7 @@ ALTER TABLE `Classification`
 -- AUTO_INCREMENT для таблицы `Movie`
 --
 ALTER TABLE `Movie`
-  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT для таблицы `Profile`
@@ -322,7 +672,7 @@ ALTER TABLE `Watchlist`
 -- AUTO_INCREMENT для таблицы `WatchlistMovie`
 --
 ALTER TABLE `WatchlistMovie`
-  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistSeries`
