@@ -1,0 +1,443 @@
+DELIMITER //
+
+-- Procedure to get all watchlists
+CREATE PROCEDURE get_all_watchlists()
+BEGIN
+    SELECT * FROM Watchlist;
+END //
+
+-- Procedure to get watchlist by its ID
+CREATE PROCEDURE get_watchlist_by_id(IN watchlistID INT)
+BEGIN
+    SELECT * FROM Watchlist WHERE WatchlistID = watchlistID;
+END //
+
+-- Procedure to create a new watchlist
+CREATE PROCEDURE create_watchlist(IN profileID INT, OUT newWatchlistID INT)
+BEGIN
+    -- Insert a new watchlist
+    INSERT INTO Watchlist (ProfileID) VALUES (profileID);
+    SET newWatchlistID = LAST_INSERT_ID();
+
+    -- Update the Profile table with the new WatchlistID
+    UPDATE Profile SET WatchlistID = newWatchlistID WHERE ProfileID = profileID;
+END //
+
+-- Procedure to delete a watchlist and its associated data
+CREATE PROCEDURE delete_watchlist(IN watchlistID INT)
+BEGIN
+    -- Remove rows from WatchlistMovie associated with the watchlist
+    DELETE FROM WatchlistMovie WHERE WatchlistID = watchlistID;
+
+    -- Remove rows from WatchlistSeries associated with the watchlist
+    DELETE FROM WatchlistSeries WHERE WatchlistID = watchlistID;
+
+    -- Delete the watchlist
+    DELETE FROM Watchlist WHERE WatchlistID = watchlistID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- Procedure to get all watchlist series
+CREATE PROCEDURE get_all_watchlist_series()
+BEGIN
+    SELECT * FROM WatchlistSeries;
+END //
+
+-- Procedure to get watchlist series by its ID
+CREATE PROCEDURE get_watchlist_series_by_id(IN watchlistSeriesID INT)
+BEGIN
+    SELECT * FROM WatchlistSeries WHERE WatchlistSeriesID = watchlistSeriesID;
+END //
+
+-- Procedure to create a new watchlist series entry
+CREATE PROCEDURE create_watchlist_series(IN watchlistID INT, IN seriesID INT)
+BEGIN
+    INSERT INTO WatchlistSeries (WatchlistID, SeriesID) VALUES (watchlistID, seriesID);
+END //
+
+-- Procedure to delete a watchlist series entry by its ID
+CREATE PROCEDURE delete_watchlist_series(IN watchlistSeriesID INT)
+BEGIN
+    DELETE FROM WatchlistSeries WHERE WatchlistSeriesID = watchlistSeriesID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- Procedure to get all watchlist movies
+CREATE PROCEDURE get_all_watchlist_movies()
+BEGIN
+    SELECT * FROM WatchlistMovie;
+END //
+
+-- Procedure to get watchlist movie by its ID
+CREATE PROCEDURE get_watchlist_movie_by_id(IN watchlistMovieID INT)
+BEGIN
+    SELECT * FROM WatchlistMovie WHERE WatchlistMovieID = watchlistMovieID;
+END //
+
+-- Procedure to create a new watchlist movie entry
+CREATE PROCEDURE create_watchlist_movie(IN watchlistID INT, IN movieID INT)
+BEGIN
+    INSERT INTO WatchlistMovie (WatchlistID, MovieID) VALUES (watchlistID, movieID);
+END //
+
+-- Procedure to delete a watchlist movie entry by its ID
+CREATE PROCEDURE delete_watchlist_movie(IN watchlistMovieID INT)
+BEGIN
+    DELETE FROM WatchlistMovie WHERE WatchlistMovieID = watchlistMovieID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+-- Procedure to get all subscriptions
+CREATE PROCEDURE get_all_subscriptions()
+BEGIN
+    SELECT * FROM Subscription;
+END //
+
+-- Procedure to get subscription by user ID
+CREATE PROCEDURE get_subscription_by_user_id(IN userID INT)
+BEGIN
+    SELECT * FROM Subscription WHERE UserID = userID;
+END //
+
+-- Procedure to update subscription
+CREATE PROCEDURE update_subscription(IN userID INT, IN subscriptionDescription VARCHAR(50), IN subscriptionPrice DOUBLE, IN subscriptionQuality VARCHAR(2), IN signUpDate DATE, IN friendInvited TINYINT, IN isPaidAccount TINYINT)
+BEGIN
+    UPDATE Subscription 
+    SET Description = subscriptionDescription, Price = subscriptionPrice, Quality = subscriptionQuality, SignUpDate = signUpDate, FriendInvited = friendInvited, IsPaidAccount = isPaidAccount
+    WHERE UserID = userID;
+END //
+
+-- Procedure to create new subscription
+CREATE PROCEDURE create_subscription(IN userID INT, IN subscriptionDescription VARCHAR(50), IN subscriptionPrice DOUBLE, IN subscriptionQuality VARCHAR(2), IN signUpDate DATE, IN friendInvited TINYINT, IN isPaidAccount TINYINT)
+BEGIN
+    INSERT INTO Subscription (UserID, Description, Price, Quality, SignUpDate, FriendInvited, IsPaidAccount)
+    VALUES (userID, subscriptionDescription, subscriptionPrice, subscriptionQuality, signUpDate, friendInvited, isPaidAccount);
+END //
+
+-- Procedure to delete subscription by user ID
+CREATE PROCEDURE delete_subscription(IN userID INT)
+BEGIN
+    DELETE FROM Subscription WHERE UserID = userID;
+END //
+
+DELIMITER ;
+
+-- Create Series Procedure
+DELIMITER $$
+CREATE PROCEDURE create_series (
+    IN p_SeriesID INT,
+    IN p_ClassificationID INT,
+    IN p_SeriesTitle VARCHAR(50),
+    IN p_SeriesDescription VARCHAR(50),
+    IN p_AmountOfViews INT,
+    IN p_AmountOfEpisodes INT,
+    IN p_ReleaseDate DATE,
+    IN p_Genre VARCHAR(50),
+    IN p_AvailableQualities VARCHAR(10)
+)
+BEGIN
+    INSERT INTO Series (SeriesID, ClassificationID, SeriesTitle, SeriesDescription, AmountOfViews, AmountOfEpisodes, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_SeriesID, p_ClassificationID, p_SeriesTitle, p_SeriesDescription, p_AmountOfViews, p_AmountOfEpisodes, p_ReleaseDate, p_Genre, p_AvailableQualities);
+END$$
+DELIMITER ;
+
+-- Delete Series Procedure
+DELIMITER $$
+CREATE PROCEDURE delete_series (
+    IN p_SeriesID INT
+)
+BEGIN
+    DELETE FROM Series WHERE SeriesID = p_SeriesID;
+END$$
+DELIMITER ;
+
+-- Get All Series Procedure
+DELIMITER $$
+CREATE PROCEDURE get_all_series ()
+BEGIN
+    SELECT * FROM Series;
+END$$
+DELIMITER ;
+
+-- Get Series By ID Procedure
+DELIMITER $$
+CREATE PROCEDURE get_series_by_id (
+    IN p_SeriesID INT
+)
+BEGIN
+    SELECT * FROM Series WHERE SeriesID = p_SeriesID;
+END$$
+DELIMITER ;
+
+-- Update Series Procedure
+DELIMITER $$
+CREATE PROCEDURE update_series (
+    IN p_SeriesID INT,
+    IN p_ClassificationID INT,
+    IN p_SeriesTitle VARCHAR(50),
+    IN p_SeriesDescription VARCHAR(50),
+    IN p_AmountOfViews INT,
+    IN p_AmountOfEpisodes INT,
+    IN p_ReleaseDate DATE,
+    IN p_Genre VARCHAR(50),
+    IN p_AvailableQualities VARCHAR(10)
+)
+BEGIN
+    UPDATE Series
+    SET ClassificationID = p_ClassificationID,
+        SeriesTitle = p_SeriesTitle,
+        SeriesDescription = p_SeriesDescription,
+        AmountOfViews = p_AmountOfViews,
+        AmountOfEpisodes = p_AmountOfEpisodes,
+        ReleaseDate = p_ReleaseDate,
+        Genre = p_Genre,
+        AvailableQualities = p_AvailableQualities
+    WHERE SeriesID = p_SeriesID;
+END$$
+DELIMITER ;
+
+-- Create Profile Procedure
+DELIMITER $$
+CREATE PROCEDURE create_profile (
+    IN p_UserID INT,
+    IN p_WatchlistID INT,
+    IN p_ProfileName VARCHAR(50),
+    IN p_ProfilePhoto TINYINT,
+    IN p_Age INT,
+    IN p_Language VARCHAR(50)
+)
+BEGIN
+    -- Validate Profile
+    IF p_Age <= 0 OR p_Age > 170 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid age. Age must be between 1 and 170.';
+    END IF;
+
+    IF NOT p_ProfileName REGEXP '^[a-zA-Z0-9\s]*$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name. Profile name must not contain special characters.';
+    END IF;
+
+    IF LENGTH(p_ProfileName) > 30 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name length. Profile name must not exceed 30 characters.';
+    END IF;
+
+    -- Check Profile Limit
+    IF (SELECT COUNT(*) FROM Profile WHERE UserID = p_UserID) >= 4 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User has reached the maximum allowed number of profiles (4).';
+    END IF;
+
+    -- Insert Profile
+    INSERT INTO Profile (UserID, WatchlistID, ProfileName, ProfilePhoto, Age, Language)
+    VALUES (p_UserID, p_WatchlistID, p_ProfileName, p_ProfilePhoto, p_Age, p_Language);
+END$$
+DELIMITER ;
+
+-- Delete Profile Procedure
+DELIMITER $$
+CREATE PROCEDURE delete_profile (
+    IN p_ProfileID INT
+)
+BEGIN
+    DELETE FROM Profile WHERE ProfileID = p_ProfileID;
+END$$
+DELIMITER ;
+
+-- Get All Profiles Procedure
+DELIMITER $$
+CREATE PROCEDURE get_all_profiles ()
+BEGIN
+    SELECT * FROM Profile;
+END$$
+DELIMITER ;
+
+-- Get Profile By ID Procedure
+DELIMITER $$
+CREATE PROCEDURE get_profile_by_id (
+    IN p_ProfileID INT
+)
+BEGIN
+    SELECT * FROM Profile WHERE ProfileID = p_ProfileID;
+END$$
+DELIMITER ;
+
+-- Update Profile Procedure
+DELIMITER $$
+CREATE PROCEDURE update_profile (
+    IN p_ProfileID INT,
+    IN p_ProfileName VARCHAR(50),
+    IN p_ProfilePhoto TINYINT,
+    IN p_Age INT,
+    IN p_Language VARCHAR(50)
+)
+BEGIN
+    -- Validate Profile
+    IF p_Age <= 0 OR p_Age > 170 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid age. Age must be between 1 and 170.';
+    END IF;
+
+    IF NOT p_ProfileName REGEXP '^[a-zA-Z0-9\s]*$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name. Profile name must not contain special characters.';
+    END IF;
+
+    IF LENGTH(p_ProfileName) > 30 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Invalid profile name length. Profile name must not exceed 30 characters.';
+    END IF;
+
+    -- Update Profile
+    UPDATE Profile
+    SET ProfileName = p_ProfileName,
+        ProfilePhoto = p_ProfilePhoto,
+        Age = p_Age,
+        Language = p_Language
+    WHERE ProfileID = p_ProfileID;
+END$$
+DELIMITER ;
+
+-- Create Movie Procedure
+DELIMITER $$
+CREATE PROCEDURE create_movie (
+    IN p_MovieID INT,
+    IN p_ClassificationID INT,
+    IN p_MovieTitle VARCHAR(50),
+    IN p_MovieDescription VARCHAR(50),
+    IN p_AmountOfViews INT,
+    IN p_ReleaseDate DATE,
+    IN p_Genre VARCHAR(50),
+    IN p_AvailableQualities VARCHAR(10)
+)
+BEGIN
+    INSERT INTO Movie (MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_MovieID, p_ClassificationID, p_MovieTitle, p_MovieDescription, p_AmountOfViews, p_ReleaseDate, p_Genre, p_AvailableQualities);
+END$$
+DELIMITER ;
+
+-- Remove Movie Procedure
+DELIMITER $$
+CREATE PROCEDURE remove_movie (
+    IN p_MovieID INT
+)
+BEGIN
+    DELETE FROM Movie WHERE MovieID = p_MovieID;
+END$$
+DELIMITER ;
+
+-- Get All Movies Procedure
+DELIMITER $$
+CREATE PROCEDURE get_all_movies ()
+BEGIN
+    SELECT * FROM Movie;
+END$$
+DELIMITER ;
+
+-- Get Movie By ID Procedure
+DELIMITER $$
+CREATE PROCEDURE get_movie_by_id (
+    IN p_MovieID INT
+)
+BEGIN
+    SELECT * FROM Movie WHERE MovieID = p_MovieID;
+END$$
+DELIMITER ;
+
+-- Update Movie Procedure
+DELIMITER $$
+CREATE PROCEDURE update_movie (
+    IN p_MovieID INT,
+    IN p_ClassificationID INT,
+    IN p_MovieTitle VARCHAR(50),
+    IN p_MovieDescription VARCHAR(50),
+    IN p_AmountOfViews INT,
+    IN p_ReleaseDate DATE,
+    IN p_Genre VARCHAR(50),
+    IN p_AvailableQualities VARCHAR(10)
+)
+BEGIN
+    UPDATE Movie
+    SET ClassificationID = p_ClassificationID,
+        MovieTitle = p_MovieTitle,
+        MovieDescription = p_MovieDescription,
+        AmountOfViews = p_AmountOfViews,
+        ReleaseDate = p_ReleaseDate,
+        Genre = p_Genre,
+        AvailableQualities = p_AvailableQualities
+    WHERE MovieID = p_MovieID;
+END$$
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE update_classification (
+    in_ClassificationID INT,
+    in_InterestedInFilms TINYINT,
+    in_InterestedInSeries TINYINT,
+    in_PreferedGenres VARCHAR(10),
+    in_MinAge VARCHAR(10),
+    in_ViewingClassification INT
+)
+BEGIN
+    UPDATE Classification
+    SET InterestedInFilms = in_InterestedInFilms,
+        InterestedInSeries = in_InterestedInSeries,
+        PreferedGenres = in_PreferedGenres,
+        MinAge = in_MinAge,
+        ViewingClassification = in_ViewingClassification
+    WHERE ClassificationID = in_ClassificationID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE get_classification_by_id (
+    in_ClassificationID INT
+)
+BEGIN
+    SELECT * FROM Classification WHERE ClassificationID = in_ClassificationID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE get_all_classifications ()
+BEGIN
+    SELECT * FROM Classification;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE remove_classification (
+    in_ClassificationID INT
+)
+BEGIN
+    DELETE FROM Classification WHERE ClassificationID = in_ClassificationID;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE create_classification (
+    in_ClassificationID INT,
+    in_InterestedInFilms TINYINT,
+    in_InterestedInSeries TINYINT,
+    in_PreferedGenres VARCHAR(10),
+    in_MinAge VARCHAR(10),
+    in_ViewingClassification INT
+)
+BEGIN
+    INSERT INTO Classification (ClassificationID, InterestedInFilms, InterestedInSeries, PreferedGenres, MinAge, ViewingClassification)
+    VALUES (in_ClassificationID, in_InterestedInFilms, in_InterestedInSeries, in_PreferedGenres, in_MinAge, in_ViewingClassification);
+END //
+
+DELIMITER ;
