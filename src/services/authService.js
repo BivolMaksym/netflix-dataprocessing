@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 const DB = require('../config/db.config')
 const Auth = require('../auth');
+require('dotenv').config();
 
 class AuthService {
     constructor() {
@@ -26,7 +27,7 @@ class AuthService {
             bcrypt.hash(password, salt, function (err, hash) {
                 const sql = 'INSERT INTO user (username, password, role) VALUES (?, ?, ?)';
                 db.query(sql, [username, hash, role]).then(() => {
-                    console.log('opgeslagen');
+                    // console.log('opgeslagen');
                 });
             });
         });

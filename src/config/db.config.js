@@ -1,4 +1,5 @@
 const mysql = require('mysql');
+require('dotenv').config();
 
 class DB {
     constructor() {
@@ -44,7 +45,7 @@ class DB {
         return this.query(sql, [Username, Email, Password, ActivationStatus, LoginAttempts, BlockStatus, FreeDaysLeft, userID]);
     }
 
-    updateUserRole(userID, role) {
+    updateUserRole(userID, newRole) {
         const sql = 'UPDATE user SET role = ? WHERE id = ?';
         return this.query(sql, [newRole, userID]);
     }
