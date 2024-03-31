@@ -2,8 +2,10 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import './css/login.css';
 import {Link} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 export default function loginComponent() {
+
 
     return (
         <div className="loginForm">
@@ -16,6 +18,7 @@ export default function loginComponent() {
 }
 
 function OnLogin() {
+    const navigate = useNavigate(); // Initialize useNavigate
     const [formData, setFormData] = useState({
         username: "",
         password: ""
@@ -27,6 +30,12 @@ function OnLogin() {
         axios.post('http://localhost:3000/auth/login', {
             username: formData.username,
             password: formData.password
+        }).then(response => {
+            const token = response.data.token;
+            localStorage.setItem('token', token);
+            navigate('/protected');
+        }).catch(error => {
+            console.error('Login error:', error);
         });
     }
 
