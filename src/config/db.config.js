@@ -16,7 +16,7 @@ class DB {
                 console.error('MySQL connection failed: ' + err.stack);
                 process.exit(1);
             }
-            console.log('Connected to MySQL database');
+            //console.log('Connected to MySQL database');
         });
     }
 
