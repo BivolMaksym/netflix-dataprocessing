@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 const DB = require('../config/db.config')
-const Auth = require('../auth');
+
+const Auth = require('../utils/auth');
 require('dotenv').config();
 
 class AuthService {

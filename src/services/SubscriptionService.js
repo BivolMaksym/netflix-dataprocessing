@@ -7,12 +7,12 @@ class SubscriptionService {
     }
 
     async getAllSubscriptions() {
-        const results = await this.db.query('SELECT * FROM Subscription');
-        return results.map((result) => new Subscription(result.SubscriptionID, result.UserID, result.Description, result.Price, result.Quality, result.SignUpDate, result.FriendInvited, result.IsPaidAccount));
+        const results = await this.db.query('CALL get_all_subscriptions()');
+        return results.map(result => new Subscription(result.SubscriptionID, result.UserID, result.Description, result.Price, result.Quality, result.SignUpDate, result.FriendInvited, result.IsPaidAccount));
     }
 
     async getSubscriptionByUserID(userID) {
-        const result = await this.db.query('SELECT * FROM Subscription WHERE UserID = ?', [userID]);
+        const result = await this.db.query('CALL get_subscription_by_user_id(?)', [userID]);
         return result.length === 1
             ? new Subscription(result[0].SubscriptionID, result[0].UserID, result[0].Description, result[0].Price, result[0].Quality, result[0].SignUpDate, result[0].FriendInvited, result[0].IsPaidAccount)
             : null;
@@ -25,7 +25,7 @@ class SubscriptionService {
             throw new Error('Invalid quality. Accepted values are HD, 4k, or SD.');
         }
 
-        await this.db.query('UPDATE Subscription SET Description = ?, Price = ?, Quality = ?, SignUpDate = ?, FriendInvited = ?, IsPaidAccount = ? WHERE UserID = ?', [updatedSubscription.Description, updatedSubscription.Price, updatedSubscription.Quality, updatedSubscription.SignUpDate, updatedSubscription.FriendInvited, updatedSubscription.IsPaidAccount, userID]);
+        await this.db.query('CALL update_subscription(?, ?, ?, ?, ?, ?, ?)', [userID, updatedSubscription.Description, updatedSubscription.Price, updatedSubscription.Quality, updatedSubscription.SignUpDate, updatedSubscription.FriendInvited, updatedSubscription.IsPaidAccount]);
     }
 
     async createSubscription(userID, newSubscription) {
@@ -42,12 +42,11 @@ class SubscriptionService {
         }
 
         // Perform validation and insertion logic
-        await this.db.query('INSERT INTO Subscription (UserID, Description, Price, Quality, SignUpDate, FriendInvited, IsPaidAccount) VALUES (?, ?, ?, ?, ?, ?, ?)', [userID, newSubscription.Description, newSubscription.Price, newSubscription.Quality, newSubscription.SignUpDate, newSubscription.FriendInvited, newSubscription.IsPaidAccount]);
+        await this.db.query('CALL create_subscription(?, ?, ?, ?, ?, ?, ?)', [userID, newSubscription.Description, newSubscription.Price, newSubscription.Quality, newSubscription.SignUpDate, newSubscription.FriendInvited, newSubscription.IsPaidAccount]);
     }
 
-
     async deleteSubscription(userID) {
-        await this.db.query('DELETE FROM Subscription WHERE UserID = ?', [userID]);
+        await this.db.query('CALL delete_subscription(?)', [userID]);
     }
 }
 

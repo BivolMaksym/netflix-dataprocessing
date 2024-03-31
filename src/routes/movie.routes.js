@@ -1,14 +1,15 @@
 const express = require('express');
 const Movie = require("../controller/movie.controller.js");
+const {verifyToken} = require("../utils/auth.js");
 
 const router = express.Router();
 const movie = new Movie();
 
 // Add new movie 
-router.post("/", movie.createMovie);
+router.post("/", movie.addMovie);
 
 // Remove a movie
-router.delete("/", movie.removeMovie);
+router.delete("/:movieID", movie.removeMovie);
 
 // Retrieve all movies
 router.get("/", movie.getAllMovies);

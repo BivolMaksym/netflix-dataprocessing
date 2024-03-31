@@ -5,7 +5,7 @@ const router = express.Router();
 const series = new Series();
 
 // Add new serie
-router.post("/:seriesID", series.createSeries);
+router.post("/", series.addSeries);
 
 // Remove a serie
 router.delete("/:seriesID", series.removeSeries);
