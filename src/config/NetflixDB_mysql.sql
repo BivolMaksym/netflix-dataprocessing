@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: mysql
--- Время создания: Мар 30 2024 г., 16:18
+-- Время создания: Мар 31 2024 г., 21:05
 -- Версия сервера: 10.9.2-MariaDB-1:10.9.2+maria~ubu2204
 -- Версия PHP: 8.0.23
 
@@ -30,9 +30,9 @@ CREATE DEFINER=`root`@`%` PROCEDURE `create_classification` (`in_ClassificationI
     VALUES (in_ClassificationID, in_InterestedInFilms, in_InterestedInSeries, in_PreferedGenres, in_MinAge, in_ViewingClassification);
 END$$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `create_movie` (IN `p_MovieID` INT, IN `p_ClassificationID` INT, IN `p_MovieTitle` VARCHAR(50), IN `p_MovieDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
-    INSERT INTO Movie (MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities)
-    VALUES (p_MovieID, p_ClassificationID, p_MovieTitle, p_MovieDescription, p_AmountOfViews, p_ReleaseDate, p_Genre, p_AvailableQualities);
+CREATE DEFINER=`root`@`%` PROCEDURE `create_movie` (IN `p_ClassificationID` INT, IN `p_MovieTitle` VARCHAR(50), IN `p_MovieDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    INSERT INTO Movie (ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_ClassificationID, p_MovieTitle, p_MovieDescription, p_AmountOfViews, p_ReleaseDate, p_Genre, p_AvailableQualities);
 END$$
 
 CREATE DEFINER=`root`@`%` PROCEDURE `create_profile` (IN `p_UserID` INT, IN `p_WatchlistID` INT, IN `p_ProfileName` VARCHAR(50), IN `p_ProfilePhoto` TINYINT, IN `p_Age` INT, IN `p_Language` VARCHAR(50))   BEGIN
@@ -59,9 +59,9 @@ CREATE DEFINER=`root`@`%` PROCEDURE `create_profile` (IN `p_UserID` INT, IN `p_W
     VALUES (p_UserID, p_WatchlistID, p_ProfileName, p_ProfilePhoto, p_Age, p_Language);
 END$$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `create_series` (IN `p_SeriesID` INT, IN `p_ClassificationID` INT, IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
-    INSERT INTO Series (SeriesID, ClassificationID, SeriesTitle, SeriesDescription, AmountOfViews, AmountOfEpisodes, ReleaseDate, Genre, AvailableQualities)
-    VALUES (p_SeriesID, p_ClassificationID, p_SeriesTitle, p_SeriesDescription, p_AmountOfViews, p_AmountOfEpisodes, p_ReleaseDate, p_Genre, p_AvailableQualities);
+CREATE DEFINER=`root`@`%` PROCEDURE `create_series` (IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+    INSERT INTO Series (SeriesTitle, SeriesDescription, AmountOfViews, AmountOfEpisodes, ReleaseDate, Genre, AvailableQualities)
+    VALUES (p_SeriesTitle, p_SeriesDescription, p_AmountOfViews, p_AmountOfEpisodes, p_ReleaseDate, p_Genre, p_AvailableQualities);
 END$$
 
 CREATE DEFINER=`root`@`%` PROCEDURE `create_subscription` (IN `userID` INT, IN `subscriptionDescription` VARCHAR(50), IN `subscriptionPrice` DOUBLE, IN `subscriptionQuality` VARCHAR(2), IN `signUpDate` DATE, IN `friendInvited` TINYINT, IN `isPaidAccount` TINYINT)   BEGIN
@@ -234,10 +234,9 @@ CREATE DEFINER=`root`@`%` PROCEDURE `update_profile` (IN `p_ProfileID` INT, IN `
     WHERE ProfileID = p_ProfileID;
 END$$
 
-CREATE DEFINER=`root`@`%` PROCEDURE `update_series` (IN `p_SeriesID` INT, IN `p_ClassificationID` INT, IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
+CREATE DEFINER=`root`@`%` PROCEDURE `update_series` (IN `p_SeriesID` INT, IN `p_SeriesTitle` VARCHAR(50), IN `p_SeriesDescription` VARCHAR(50), IN `p_AmountOfViews` INT, IN `p_AmountOfEpisodes` INT, IN `p_ReleaseDate` DATE, IN `p_Genre` VARCHAR(50), IN `p_AvailableQualities` VARCHAR(10))   BEGIN
     UPDATE Series
-    SET ClassificationID = p_ClassificationID,
-        SeriesTitle = p_SeriesTitle,
+    SET SeriesTitle = p_SeriesTitle,
         SeriesDescription = p_SeriesDescription,
         AmountOfViews = p_AmountOfViews,
         AmountOfEpisodes = p_AmountOfEpisodes,
@@ -270,22 +269,12 @@ CREATE TABLE `Classification` (
   `ViewingClassification` int(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
+--
+-- Дамп данных таблицы `Classification`
+--
 
---
--- Дублирующая структура для представления `ClassificationInformation`
--- (См. Ниже фактическое представление)
---
-CREATE TABLE `ClassificationInformation` (
-`ClassificationID` int(11)
-,`InterestedInFilms` tinyint(4)
-,`InterestedInSeries` tinyint(4)
-,`PreferedGenres` varchar(10)
-,`MinimumAge` varchar(10)
-,`ViewingClassification` int(10)
-,`ProfileID` int(11)
-,`ProfileName` varchar(50)
-);
+INSERT INTO `Classification` (`ClassificationID`, `InterestedInFilms`, `InterestedInSeries`, `PreferedGenres`, `MinimumAge`, `ViewingClassification`) VALUES
+(1, 0, 0, 'horror', '15', 1);
 
 -- --------------------------------------------------------
 
@@ -310,7 +299,7 @@ CREATE TABLE `Movie` (
 
 INSERT INTO `Movie` (`MovieID`, `ClassificationID`, `MovieTitle`, `MovieDescription`, `AmountOfViews`, `ReleaseDate`, `Genre`, `AvailableQualities`) VALUES
 (1, NULL, '123123', '123123123', 123123321, '2024-01-02', NULL, '123'),
-(2, NULL, 'agsaasd', 'asdsadg', 1231, '2024-01-02', NULL, '123');
+(2, 1, 'Adventure time', 'Bad film', 4, '2004-12-12', 'action', 'HD');
 
 -- --------------------------------------------------------
 
@@ -339,20 +328,6 @@ INSERT INTO `Profile` (`ProfileID`, `UserID`, `ClassificationID`, `WatchlistID`,
 -- --------------------------------------------------------
 
 --
--- Дублирующая структура для представления `ProfileWatchlistContent`
--- (См. Ниже фактическое представление)
---
-CREATE TABLE `ProfileWatchlistContent` (
-`ProfileID` int(11)
-,`ProfileName` varchar(50)
-,`WatchlistID` int(11)
-,`MovieTitle` varchar(50)
-,`SeriesTitle` varchar(50)
-);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `Series`
 --
 
@@ -373,7 +348,9 @@ CREATE TABLE `Series` (
 --
 
 INSERT INTO `Series` (`SeriesID`, `ClassificationID`, `SeriesTitle`, `SeriesDescription`, `AmountOfViews`, `AmountOfEpisodes`, `ReleaseDate`, `Genre`, `availableQualities`) VALUES
-(1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, NULL, 'Wahtever', 'Good film haa', NULL, NULL, '2004-12-12', 'romance', 'SD'),
+(4, NULL, 'Wahtever', 'Good film haa', NULL, NULL, '2004-12-12', 'romance', 'SD');
 
 -- --------------------------------------------------------
 
@@ -428,46 +405,6 @@ INSERT INTO `User` (`UserID`, `SubscriptionID`, `Username`, `Email`, `Password`,
 -- --------------------------------------------------------
 
 --
--- Дублирующая структура для представления `UserProfileInformation`
--- (См. Ниже фактическое представление)
---
-CREATE TABLE `UserProfileInformation` (
-`UserID` int(11)
-,`Username` varchar(50)
-,`Email` varchar(50)
-,`ActivationStatus` tinyint(4)
-,`LoginAttempts` int(11)
-,`BlockStatus` tinyint(4)
-,`FreeDaysLeft` int(11)
-,`role` varchar(50)
-,`ProfileID` int(11)
-,`ProfilePhoto` tinyint(4)
-,`Age` int(11)
-,`Language` varchar(50)
-);
-
--- --------------------------------------------------------
-
---
--- Дублирующая структура для представления `UserSubscriptionDetails`
--- (См. Ниже фактическое представление)
---
-CREATE TABLE `UserSubscriptionDetails` (
-`UserID` int(11)
-,`Username` varchar(50)
-,`Email` varchar(50)
-,`SubscriptionID` int(11)
-,`Description` varchar(50)
-,`Price` double
-,`Quality` varchar(2)
-,`SignUpDate` date
-,`FriendInvited` tinyint(4)
-,`IsPaidAccount` tinyint(4)
-);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `Watchlist`
 --
 
@@ -496,14 +433,6 @@ CREATE TABLE `WatchlistMovie` (
   `MovieID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Дамп данных таблицы `WatchlistMovie`
---
-
-INSERT INTO `WatchlistMovie` (`WatchlistMovieID`, `WatchlistID`, `MovieID`) VALUES
-(5, 28, 1),
-(6, 28, 2);
-
 -- --------------------------------------------------------
 
 --
@@ -515,42 +444,6 @@ CREATE TABLE `WatchlistSeries` (
   `WatchlistID` int(11) NOT NULL,
   `SeriesID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Структура для представления `ClassificationInformation`
---
-DROP TABLE IF EXISTS `ClassificationInformation`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `ClassificationInformation`  AS SELECT `c`.`ClassificationID` AS `ClassificationID`, `c`.`InterestedInFilms` AS `InterestedInFilms`, `c`.`InterestedInSeries` AS `InterestedInSeries`, `c`.`PreferedGenres` AS `PreferedGenres`, `c`.`MinimumAge` AS `MinimumAge`, `c`.`ViewingClassification` AS `ViewingClassification`, `p`.`ProfileID` AS `ProfileID`, `p`.`ProfileName` AS `ProfileName` FROM (`Classification` `c` join `Profile` `p` on(`c`.`ClassificationID` = `p`.`ClassificationID`))  ;
-
--- --------------------------------------------------------
-
---
--- Структура для представления `ProfileWatchlistContent`
---
-DROP TABLE IF EXISTS `ProfileWatchlistContent`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `ProfileWatchlistContent`  AS SELECT `p`.`ProfileID` AS `ProfileID`, `p`.`ProfileName` AS `ProfileName`, `w`.`WatchlistID` AS `WatchlistID`, `m`.`MovieTitle` AS `MovieTitle`, `s`.`SeriesTitle` AS `SeriesTitle` FROM (((((`Profile` `p` join `Watchlist` `w` on(`p`.`WatchlistID` = `w`.`WatchlistID`)) left join `WatchlistMovie` `wm` on(`w`.`WatchlistID` = `wm`.`WatchlistID`)) left join `Movie` `m` on(`wm`.`MovieID` = `m`.`MovieID`)) left join `WatchlistSeries` `ws` on(`w`.`WatchlistID` = `ws`.`WatchlistID`)) left join `Series` `s` on(`ws`.`SeriesID` = `s`.`SeriesID`))  ;
-
--- --------------------------------------------------------
-
---
--- Структура для представления `UserProfileInformation`
---
-DROP TABLE IF EXISTS `UserProfileInformation`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `UserProfileInformation`  AS SELECT `u`.`UserID` AS `UserID`, `u`.`Username` AS `Username`, `u`.`Email` AS `Email`, `u`.`ActivationStatus` AS `ActivationStatus`, `u`.`LoginAttempts` AS `LoginAttempts`, `u`.`BlockStatus` AS `BlockStatus`, `u`.`FreeDaysLeft` AS `FreeDaysLeft`, `u`.`role` AS `role`, `p`.`ProfileID` AS `ProfileID`, `p`.`ProfilePhoto` AS `ProfilePhoto`, `p`.`Age` AS `Age`, `p`.`Language` AS `Language` FROM (`User` `u` join `Profile` `p` on(`u`.`UserID` = `p`.`UserID`))  ;
-
--- --------------------------------------------------------
-
---
--- Структура для представления `UserSubscriptionDetails`
---
-DROP TABLE IF EXISTS `UserSubscriptionDetails`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `UserSubscriptionDetails`  AS SELECT `u`.`UserID` AS `UserID`, `u`.`Username` AS `Username`, `u`.`Email` AS `Email`, `s`.`SubscriptionID` AS `SubscriptionID`, `s`.`Description` AS `Description`, `s`.`Price` AS `Price`, `s`.`Quality` AS `Quality`, `s`.`SignUpDate` AS `SignUpDate`, `s`.`FriendInvited` AS `FriendInvited`, `s`.`IsPaidAccount` AS `IsPaidAccount` FROM (`User` `u` join `Subscription` `s` on(`u`.`SubscriptionID` = `s`.`SubscriptionID`))  ;
 
 --
 -- Индексы сохранённых таблиц
@@ -630,13 +523,13 @@ ALTER TABLE `WatchlistSeries`
 -- AUTO_INCREMENT для таблицы `Classification`
 --
 ALTER TABLE `Classification`
-  MODIFY `ClassificationID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ClassificationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT для таблицы `Movie`
 --
 ALTER TABLE `Movie`
-  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `MovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT для таблицы `Profile`
@@ -648,7 +541,7 @@ ALTER TABLE `Profile`
 -- AUTO_INCREMENT для таблицы `Series`
 --
 ALTER TABLE `Series`
-  MODIFY `SeriesID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `SeriesID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `Subscription`
@@ -672,7 +565,7 @@ ALTER TABLE `Watchlist`
 -- AUTO_INCREMENT для таблицы `WatchlistMovie`
 --
 ALTER TABLE `WatchlistMovie`
-  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `WatchlistMovieID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `WatchlistSeries`
@@ -683,12 +576,6 @@ ALTER TABLE `WatchlistSeries`
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
-
---
--- Ограничения внешнего ключа таблицы `Classification`
---
-ALTER TABLE `Classification`
-  ADD CONSTRAINT `Classification_ibfk_1` FOREIGN KEY (`ViewingClassification`) REFERENCES `Category_enums` (`CategoryID`);
 
 --
 -- Ограничения внешнего ключа таблицы `Movie`
