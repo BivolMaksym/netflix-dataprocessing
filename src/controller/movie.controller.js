@@ -1,75 +1,153 @@
 const MovieService = require('../services/MovieService');
+const response = require("../utils/responses.js");
+const validator = require("../utils/validators.js");
 
 class Movie {
     constructor() {
         this.movieService = new MovieService();
     }
 
-    createMovie = async (req, res) => {
+    addMovie = async (req, res) => {
+        const receivedAcceptType = req.headers.accept;
         const newMovie = req.body;
+        console.log("newmovie:", newMovie);
         
         try {
-            await this.movieService.createMovie(newMovie);
-            const {MovieID, ClassificationID, MovieTitle, MovieDescription, AmountOfViews, ReleaseDate, Genre, AvailableQualities} = req.body;
+            // Data validation
+            if(!newMovie.MovieTitle || !newMovie.ClassificationID || !newMovie.MovieDescription || !newMovie.ReleaseDate || !newMovie.Genre || !newMovie.AvailableQualities) {
+                throw {
+                    status: 400,
+                    message: "Error occured adding movie, you are missing information",
+                  };
+            }
             
-            // if(!MovieID || !ClassificationID || !MovieTitle || !MovieDescription || !AmountOfViews || !ReleaseDate || !Genre || !AvailableQualities) {
-            //     return res.status(400).send("Missing information for creating new movie.")
-            // } 
-            res.status(200).send("Movie added successfully")
-        }  catch (err) {
-            console.error('Error creating a movie:', err);
-            res.status(500).send("Internal server error");
+            validator.validateInt(newMovie.ClassificationID, "ClassificationID");
+
+            const movie = await this.movieService.createMovie(newMovie);
+            console.log("movie:", movie);
+
+            const message = "Movie added successfully";
+            response.statusCode201(receivedAcceptType, message, res);
+        }  catch (error) {
+            if(error.status === 400 && error.message){
+
+                response.statusCode400(receivedAcceptType, error.message, res);
+            }else{
+                console.log('Error adding new admin: ', error);
+                const message = 'Internal server error';
+                response.statusCode500(receivedAcceptType, message, res);   
+            }
         }
-        
     };
 
     removeMovie = async (req, res) => {
-        const movieID = req.body;
+        const receivedAcceptType = req.headers.accept;
+        const movieID = parseInt(req.params.movieID, 10);
+
+        console.log("movieID: ", movieID);
 
         try {
-           
-            await this.movieService.removeMovie(movieID);
-            res.json({message: 'Movie deleted successfully'});
-        } catch (err) {
-            console.error('Error deleting movie: ', err.message);
-            res.status(500).send('Internal server error');
+            const deletedMovie = await this.movieService.removeMovie(movieID);
+            console.log("deletedMovie: ", deletedMovie);
+            if (!deletedMovie) {
+                const message = "Movie not found";
+                response.statusCode404(receivedAcceptType, message, res);
+            } else {
+                const message = "Movie deleted successfully";
+                response.statusCode204(receivedAcceptType, message, res);
+            }
+
+        } catch (error) {
+            if(error.status === 400 && error.message){
+
+                response.statusCode400(receivedAcceptType, error.message, res);
+            }else{
+                console.log('Error deleting movie: ', error);
+                const message = 'Internal server error';
+                response.statusCode500(receivedAcceptType, message, res);   
+            }
         }
     };
 
     getAllMovies = async (req, res) => {
+        const receivedAcceptType = req.headers.accept;
+        
+        
+        
         try {
             const movies = await this.movieService.getAllMovies();
-            res.json(movies);
-        } catch (err) {
-            console.error('Error getting all movies: ', err.message);
-            res.status(500).send('Internal server error');
+            console.log("movies:", movies);
+        if (movies) {
+            const message = "List of movies retrieved successfully";
+            response.statusCode200(receivedAcceptType, message, res, movies);
+        } else {
+            const message = "Error occured when you tried to retrieve the list of movies";
+            response.statusCode404(receivedAcceptType, message, res);
+        }
+        } catch (error) {
+            if(error.status === 400 && error.message){
+
+                response.statusCode400(receivedAcceptType, error.message, res);
+            }else{
+                console.log('Error retrieving movies: ', error);
+                const message = 'Internal server error';
+                response.statusCode500(receivedAcceptType, message, res);   
+            }
         }
     };
 
     getMovieByItsID = async (req, res) => {
+        const receivedAcceptType = req.headers.accept;
+        const movieID = parseInt(req.params.movieID, 10);
         try {
+            
             const movie = await this.movieService.getMovieByItsID(movieID);
-            if (movie) {
-                res.json(movie);
+            if (movie[0] === 0) {
+                const message = "Movie with provided id is successfully retrieved.";
+                response.statusCode200(receivedAcceptType, message, res, movie);
             } else {
-                res.status(401).send('Movie with such ID is not found.')
+                const message = "Movie with such id is not found.";
+                response.statusCode404(receivedAcceptType, message, res);
             }
-        }  catch (err) {
-            console.error('Error getting movie with such id: ', err.message);
-            res.status(500).send('Internal server error');
+        }  catch (error) {
+            if(error.status === 400 && error.message){
+
+                response.statusCode400(receivedAcceptType, error.message, res);
+            }else{
+                console.log('Error retrieving movie with provided id: ', error);
+                const message = 'Internal server error';
+                response.statusCode500(receivedAcceptType, message, res);   
+            }
         }
     };
 
     updateMovie = async (req, res) => {
+        const receivedAcceptType = req.headers.accept;
         const movieID = parseInt(req.params.movieID);
+        
         const updatedMovie = req.body;
 
         try {
-            await this.movieService.updateMovie(movieID, updatedMovie);
-            res.json({message: 'Movie updated successfully'});
-        } catch (err) {
-            console.error('Error updating movie: ', error.message);
-            res.status(500).send('Internal server error');
+            
+            const result = await this.movieService.updateMovie(movieID, updatedMovie);
+            console.log("result:", result);
+            if (!result) {
+                const message = "Movie updated successfully";
+                response.statusCode200(receivedAcceptType, message, res);
+            } else {
+                const message = "Movie with such id is not found";
+                response.statusCode404(receivedAcceptType, message, res);
+            }
+            
+        } catch (error) {
+            if(error.status === 400 && error.message){
+
+                response.statusCode400(receivedAcceptType, error.message, res);
+            }else{
+                console.log('Error updating movie with provided id: ', error);
+                const message = 'Internal server error';
+                response.statusCode500(receivedAcceptType, message, res);   
+            }
         }
     }
 

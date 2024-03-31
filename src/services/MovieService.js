@@ -7,8 +7,7 @@ class MovieService {
     }
 
     async createMovie(newMovie) {
-        await this.db.query('CALL create_movie(?, ?, ?, ?, ?, ?, ?, ?)', [
-            newMovie.MovieID,
+        await this.db.query('CALL create_movie(?, ?, ?, ?, ?, ?, ?)', [
             newMovie.ClassificationID,
             newMovie.MovieTitle,
             newMovie.MovieDescription,
@@ -20,22 +19,27 @@ class MovieService {
     }
 
     async removeMovie(movieID) {
-        await this.db.query('CALL remove_movie(?)', [movieID]);
+        const result = await this.db.query('CALL remove_movie(?)', [movieID]);
+        return result;
     }
 
     async getAllMovies() {
         const results = await this.db.query('CALL get_all_movies()');
-        return results.map((result) => new Movie(result.MovieID, result.ClassificationID, result.MovieTitle, result.MovieDescription, result.AmountOfViews, result.ReleaseDate, result.Genre, result.AvailableQualities));
+        return results;
+        // .map((result) => new Movie(result.MovieID, result.ClassificationID, result.MovieTitle, result.MovieDescription, result.AmountOfViews, result.ReleaseDate, result.Genre, result.AvailableQualities));
     }
 
     async getMovieByItsID(movieID) {
         const result = await this.db.query('CALL get_movie_by_id(?)', [movieID]);
-        return result.length === 1 ? new Movie(result[0].MovieID, result[0].ClassificationID, result[0].MovieTitle, result[0].MovieDescription, result[0].AmountOfViews, result[0].ReleaseDate, result[0].Genre, result[0].AvailableQualities) : null;
+        return result;
+        // .length === 1 ? new Movie(result[0].MovieID, result[0].ClassificationID, result[0].MovieTitle, result[0].MovieDescription, result[0].AmountOfViews, result[0].ReleaseDate, result[0].Genre, result[0].AvailableQualities) : null;
     }
 
     async updateMovie(movieID, updatedMovie) {
-        await this.db.query('CALL update_movie (?, ?, ?, ?, ?, ?, ?, ?)', [
-            updatedMovie.MovieID,
+        console.log("updated movie:", updatedMovie);
+        console.log("movieid:", movieID);
+        const result = await this.db.query('CALL update_movie (?, ?, ?, ?, ?, ?, ?, ?)', [
+            movieID,
             updatedMovie.ClassificationID,
             updatedMovie.MovieTitle,
             updatedMovie.MovieDescription,
@@ -44,6 +48,7 @@ class MovieService {
             updatedMovie.Genre,
             updatedMovie.AvailableQualities
         ]);
+        return result;
     }
 }
 
